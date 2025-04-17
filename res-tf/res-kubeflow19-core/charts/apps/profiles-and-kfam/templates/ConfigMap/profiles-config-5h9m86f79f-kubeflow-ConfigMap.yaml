@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  ADMIN: ''
+  ISTIO_INGRESS_GATEWAY_PRINCIPAL: cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+  KFP_UI_PRINCIPAL: cluster.local/ns/kubeflow/sa/ml-pipeline-ui
+  NOTEBOOK_CONTROLLER_PRINCIPAL: cluster.local/ns/kubeflow/sa/notebook-controller-service-account
+  USERID_HEADER: kubeflow-userid
+  USERID_PREFIX: ''
+  WORKLOAD_IDENTITY: ''
+kind: ConfigMap
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-config-5h9m86f79f
+  namespace: kubeflow

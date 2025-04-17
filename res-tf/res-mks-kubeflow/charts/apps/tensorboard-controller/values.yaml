@@ -1,0 +1,31 @@
+# Default values for TensorBoard Controller ConfigMap
+tensorboardControllerConfigB98Cb9Gk9K:
+  rwoPvcScheduling: "True"
+  tensorboardImage: tensorflow/tensorflow:2.5.1
+# Default values for TensorBoard Controller Deployment
+tensorboardControllerDeployment:
+  kubeRbacProxy:
+    image:
+      repository: gcr.io/kubebuilder/kube-rbac-proxy
+      tag: v0.8.0
+    resources:
+      limits:
+        cpu: 500m
+        memory: 128Mi
+      requests:
+        cpu: 5m
+        memory: 64Mi
+  manager:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+    image:
+      repository: docker.io/kubeflownotebookswg/tensorboard-controller
+      tag: v1.8.0
+    resources:
+      limits:
+        cpu: 500m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+  replicas: 1

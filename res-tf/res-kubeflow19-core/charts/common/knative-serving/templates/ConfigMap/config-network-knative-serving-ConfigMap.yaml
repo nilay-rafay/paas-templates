@@ -1,0 +1,87 @@
+apiVersion: v1
+data:
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that "kubectl edit" this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+
+    # ingress-class specifies the default ingress class
+    # to use when not dictated by Route annotation.
+    #
+    # If not specified, will use the Istio ingress.
+    ingress-class: "istio.ingress.networking.knative.dev"
+
+    # certificate-class specifies the default Certificate class
+    # to use when not dictated by Route annotation.
+    #
+    # If not specified, will use the Cert-Manager Certificate.
+    certificate-class: "cert-manager.certificate.networking.knative.dev"
+
+    # namespace-wildcard-cert-selector specifies a LabelSelector which
+    # determines which namespaces should have a wildcard certificate
+    # provisioned.
+    namespace-wildcard-cert-selector: ""
+
+    # domain-template specifies the golang text template string to use
+    # when constructing the Knative service's DNS name.
+    domain-template: "{{`{{.Name}}`}}.{{`{{.Namespace}}`}}.{{`{{.Domain}}`}}"
+
+    # tag-template specifies the golang text template string to use
+    # when constructing the DNS name for "tags".
+    tag-template: "{{`{{.Tag}}`}}-{{`{{.Name}}`}}"
+
+    # external-domain-tls controls whether TLS certificates are automatically
+    # provisioned for cluster external domains.
+    external-domain-tls: "Disabled"
+
+    # cluster-local-domain-tls controls whether TLS certificates are automatically
+    # provisioned for cluster local domains.
+    cluster-local-domain-tls: "Disabled"
+
+    # system-internal-tls controls whether TLS encryption is used for internal
+    # Knative components.
+    system-internal-tls: "Disabled"
+
+    # Controls the behavior of the HTTP endpoint for the Knative ingress.
+    http-protocol: "Enabled"
+
+    # rollout-duration contains the minimal duration in seconds over which
+    # the Configuration traffic targets are rolled out to the newest revision.
+    rollout-duration: "0"
+
+    # autocreate-cluster-domain-claims controls whether ClusterDomainClaims should
+    # be automatically created as needed for DomainMappings.
+    autocreate-cluster-domain-claims: "false"
+
+    # enable-mesh-pod-addressability allows pods to be directly accessible
+    # via their IPs when mesh is enabled.
+    enable-mesh-pod-addressability: "false"
+
+    # mesh-compatibility-mode indicates whether to use Pod IPs or Cluster IPs
+    # when mesh is enabled.
+    mesh-compatibility-mode: "auto"
+
+    # default-external-scheme defines the scheme used for external URLs
+    # if auto-tls is not enabled.
+    default-external-scheme: "http"
+kind: ConfigMap
+metadata:
+  annotations:
+    knative.dev/example-checksum: 0573e07d
+  labels:
+    app.kubernetes.io/component: networking
+    app.kubernetes.io/name: knative-serving
+    app.kubernetes.io/version: 1.12.4
+  name: config-network
+  namespace: knative-serving

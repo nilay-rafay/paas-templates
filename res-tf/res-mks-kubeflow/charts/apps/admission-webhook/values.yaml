@@ -1,0 +1,5 @@
+admissionWebhookDeployment:
+  admissionWebhook:
+    image:
+      repository: docker.io/kubeflownotebookswg/poddefaults-webhook
+      tag: v1.8.0

@@ -1,0 +1,58 @@
+apiVersion: v1
+data:
+  config.yaml: |
+    issuer: {{ .Values.dex.issuer }}
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+    web:
+      http: 0.0.0.0:5556
+    logger:
+      level: "debug"
+      format: text
+    oauth2:
+      skipApprovalScreen: true
+    enablePasswordDB: true
+    staticPasswords:
+    - email: {{ .Values.dex.staticuser.email }}
+      hash: {{ .Values.dex.staticuser.password }}
+       # https://github.com/dexidp/dex/pull/1601/commits
+       # FIXME: Use hashFromEnv instead
+      username: user
+      userID: "15841185641784"
+    staticClients:
+    # https://github.com/dexidp/dex/pull/1664
+    - idEnv: OIDC_CLIENT_ID
+      redirectURIs: ["/authservice/oidc/callback"]
+      name: 'Dex Login Application'
+      secretEnv: OIDC_CLIENT_SECRET
+    connectors:
+    - type: oidc
+      id: okta
+      name: Okta
+      config:
+        issuer: https://{{ .Values.dex.connector.okta.domain }}
+
+        clientID: {{ .Values.dex.connector.okta.clientID }}
+        clientSecret: {{ .Values.dex.connector.okta.clientSecret }}
+
+        ## replace with your deploykf domain
+        ## NOTE: this must be an allowed redirect URI in the Okta app
+        redirectURI: {{ .Values.dex.issuer }}/callback
+        ## openid scopes to request
+        scopes:
+          - openid
+          - email
+          - profile
+          ## NOTE: offline_access is required for refresh tokens
+          ##  - ensure the Okta app has "Refresh Token" grant type enabled
+          ##  - set the "Refresh Token Behavior" to "Rotate token after every use"
+          - offline_access
+
+        ## okta does not always send the `email_verified` claim
+        insecureSkipEmailVerified: true
+kind: ConfigMap
+metadata:
+  name: dex
+  namespace: auth

@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: preboot-commands
+  namespace: kube-system
+data:
+  entrypoint.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    ### Set variables to denote container runtime in use by node ###
+    IS_CONTAINERD=false
+    IS_DOCKER=false
+    if chroot "${ROOT_DIR}" tr \\0 ' ' < /proc/"$(pgrep kubelet)"/cmdline | grep containerd > /dev/null; then
+      IS_CONTAINERD=true
+    else
+      IS_DOCKER=true
+    fi
+
+    ### User provider pre-bootstrap commands will go here ###
+    {{- range .Values.commands }}
+      {{- . | nindent 4 }}
+    {{- end }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: preboot-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      rafay-app: preboot-daemonset
+  template:
+    metadata:
+      labels:
+        rafay-app: preboot-daemonset
+    spec:
+      serviceAccountName: preboot-sa
+      nodeSelector:
+        kubernetes.io/os: linux
+      hostNetwork: true
+      hostPID: true
+      volumes:
+        - name: root-mount
+          hostPath:
+            path: /
+        - name: entrypoint
+          configMap:
+            name: preboot-commands
+            defaultMode: 484
+      initContainers:
+        - image: registry.dev.rafay-edge.net/rafay/ubuntu_16_0_4:latest
+          name: preboot-commands
+          command:
+            - /scripts/entrypoint.sh
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+            privileged: true
+          env:
+            - name: ROOT_DIR
+              value: /root
+          volumeMounts:
+            - name: root-mount
+              mountPath: /root
+            - name: entrypoint
+              mountPath: /scripts
+      containers:
+        - image: 'registry.dev.rafay-edge.net/rafay/pause:3.2'
+          name: pause
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: preboot-cluster-role
+  namespace: kube-system
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: preboot-cluster-rolebinding
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: preboot-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: preboot-sa
+  namespace: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: preboot-sa
+  namespace: kube-system

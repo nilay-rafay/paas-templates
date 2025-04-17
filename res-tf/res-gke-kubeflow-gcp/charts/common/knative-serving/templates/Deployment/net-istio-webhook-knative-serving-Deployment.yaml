@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: net-istio
+    app.kubernetes.io/name: knative-serving
+    app.kubernetes.io/version: 1.12.3
+    networking.knative.dev/ingress-provider: istio
+  name: net-istio-webhook
+  namespace: knative-serving
+spec:
+  selector:
+    matchLabels:
+      app: net-istio-webhook
+      role: net-istio-webhook
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+      labels:
+        app: net-istio-webhook
+        app.kubernetes.io/component: net-istio
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.12.3
+        role: net-istio-webhook
+    spec:
+      containers:
+      - env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_LOGGING_NAME
+          value: config-logging
+        - name: CONFIG_OBSERVABILITY_NAME
+          value: config-observability
+        - name: METRICS_DOMAIN
+          value: knative.dev/net-istio
+        - name: WEBHOOK_NAME
+          value: net-istio-webhook
+        - name: WEBHOOK_PORT
+          value: '8443'
+        image: gcr.io/knative-releases/knative.dev/net-istio/cmd/webhook@sha256:eeff0ad31550f3ff519d988bb36bfe214e5b60c1ec4349c1f9bb2b2d8cad9479
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            httpHeaders:
+            - name: k-kubelet-probe
+              value: webhook
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 20
+          periodSeconds: 1
+        name: webhook
+        ports:
+        - containerPort: 9090
+          name: metrics
+        - containerPort: 8008
+          name: profiling
+        - containerPort: 8443
+          name: https-webhook
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: k-kubelet-probe
+              value: webhook
+            port: 8443
+            scheme: HTTPS
+          periodSeconds: 1
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 20m
+            memory: 20Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      serviceAccountName: controller

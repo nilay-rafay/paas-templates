@@ -1,0 +1,33 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+ name: patch-pod-runtime-class-mwc
+webhooks:
+ - name: patch-pod-runtime-class.kube-system.svc
+   admissionReviewVersions: ["v1"]
+   sideEffects: None
+   rules:
+     - apiGroups:
+         - "*"
+       apiVersions:
+         - "*"
+       resources:
+         - pods
+       operations:
+         - CREATE
+         - UPDATE
+   clientConfig:
+     caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNFekNDQWJxZ0F3SUJBZ0lVTFlmUmJBNEx2dEZvSW8zZnl4WnhNSXFZSldvd0NnWUlLb1pJemowRUF3SXcKYURFTE1Ba0dBMVVFQmhNQ1ZWTXhDekFKQmdOVkJBZ1RBa05CTVJJd0VBWURWUVFIRXdsVGRXNXVlWFpoYkdVeApGakFVQmdOVkJBb1REVkpoWm1GNUlGTjVjM1JsYlhNeElEQWVCZ05WQkFNTUYwRmtiV2x6YzJsdmJsOURiMjUwCmNtOXNiR1Z5WDBOQk1CNFhEVEkwTVRBd09URTBORFl3TUZvWERUTTBNVEF3TnpFME5EWXdNRm93YURFTE1Ba0cKQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdUQWtOQk1SSXdFQVlEVlFRSEV3bFRkVzV1ZVhaaGJHVXhGakFVQmdOVgpCQW9URFZKaFptRjVJRk41YzNSbGJYTXhJREFlQmdOVkJBTU1GMEZrYldsemMybHZibDlEYjI1MGNtOXNiR1Z5ClgwTkJNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVkRi9ETGIwSk1UWWxpREcyT1ZjdW93TkUKYmR5eE0rUlZHeVpmRTVkM3BqNVJVa0duRVpoc3B2ZUdMMkZNT215UzJaQTh5bDNaVTJQOHE1NGdmWEo2MXFOQwpNRUF3RGdZRFZSMFBBUUgvQkFRREFnRUdNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGT3N5ClBPWHA3Q0l2VVhKUHhKNzUyU1RFbCswY01Bb0dDQ3FHU000OUJBTUNBMGNBTUVRQ0lHNm5QU0hRcVNZeGRDQjMKK0FRUEltbmhiUGtEdzQzdThUYWg3TkJ0T0tMWEFpQVJXNzllaGhpRTBRZ3RsNU56MlVnOHBQbGxqZDV3SDBWdgpMdmFsUUtPTGR3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+     service:
+       name: patch-pod-runtime-class
+       namespace: kube-system
+       path: /patch
+       port: 7443
+   namespaceSelector:
+     matchExpressions:
+       - key: "kubernetes.io/metadata.name"
+         values:
+           - "kube-system"
+         operator: NotIn
+   failurePolicy: Fail
+   reinvocationPolicy: IfNeeded

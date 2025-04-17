@@ -1,0 +1,303 @@
+# Default values for kserve Hubgingface server
+kserveHuggingfaceserver:
+  kserveContainer:
+    image:
+      repository: kserve/huggingfaceserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v2
+  - v1
+  supportedModelFormats:
+  - autoSelect: true
+    name: huggingface
+    priority: 1
+    version: '1'
+
+# Kserve LGB server
+kserveLgbserver:
+  kserveContainer:
+    image:
+      repository: kserve/lgbserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: lightgbm
+    priority: 1
+    version: '3'
+
+# Kserve ML SeldonIO server
+kserveMLserver:
+  kserveContainer:
+    image: 
+      repository: docker.io/seldonio/mlserver
+      tag: 1.3.2
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  supportedModelFormats: 
+  - autoSelect: true
+    name: sklearn
+    priority: 2
+    version: '0'
+  - autoSelect: true
+    name: sklearn
+    priority: 2
+    version: '1'
+  - autoSelect: true
+    name: xgboost
+    priority: 2
+    version: '1'
+  - autoSelect: true
+    name: lightgbm
+    priority: 2
+    version: '3'
+  - autoSelect: true
+    name: mlflow
+    priority: 1
+    version: '1'
+  protocolVersions:
+  - v2
+
+# Kserve Paddle server
+kservePaddleserver:
+  kserveContainer:
+    image:
+      repository: kserve/paddleserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: paddle
+    priority: 1
+    version: '2'
+
+# Kserve PMML server
+kservePMMLserver:
+  kserveContainer:
+    image: 
+      repository: kserve/pmmlserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: pmml
+    priority: 1
+    version: '3'
+  - autoSelect: true
+    name: pmml
+    priority: 1
+    version: '4'
+
+# kserve Sklearn (Scikit-Learn Server) server
+kserveSklearnserver:
+  kserveContainer:
+    image:
+      repository: kserve/sklearnserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: sklearn
+    priority: 1
+    version: '1'
+
+# Kserve Tensorflow server
+kserveTensorflowServing:
+  kserveContainer:
+    image:
+      repository: tensorflow/serving
+      tag: 2.6.2
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - grpc-v1
+  supportedModelFormats:
+  - autoSelect: true
+    name: tensorflow
+    priority: 2
+    version: '1'
+  - autoSelect: true
+    name: tensorflow
+    priority: 2
+    version: '2'
+
+# Kserve Torch server
+kserveTorchserve:
+  kserveContainer:
+    image:
+      repository: pytorch/torchserve-kfs
+      tag: 0.9.0
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  - grpc-v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: pytorch
+    priority: 2
+    version: '1'
+
+# Kserve Triton server
+kserveTritonserver:
+  kserveContainer:
+    image: 
+      repository: nvcr.io/nvidia/tritonserver
+      tag: 23.05-py3
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v2
+  - grpc-v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: tensorrt
+    priority: 1
+    version: '8'
+  - autoSelect: true
+    name: tensorflow
+    priority: 1
+    version: '1'
+  - autoSelect: true
+    name: tensorflow
+    priority: 1
+    version: '2'
+  - autoSelect: true
+    name: onnx
+    priority: 1
+    version: '1'
+  - name: pytorch
+    version: '1'
+  - autoSelect: true
+    name: triton
+    priority: 1
+    version: '2'
+
+# Kserve XGBoost server
+kserveXgbserver:
+  kserveContainer:
+    image: 
+      repository: kserve/xgbserver
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+  protocolVersions:
+  - v1
+  - v2
+  supportedModelFormats:
+  - autoSelect: true
+    name: xgboost
+    priority: 1
+    version: '1'
+
+# Kserve storageInitializer default values
+default:
+  storageInitializer:
+    image:
+      repository: kserve/storage-initializer
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: '1'
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+  supportedUriFormats:
+  - prefix: gs://
+  - prefix: s3://
+  - prefix: hdfs://
+  - prefix: webhdfs://
+  - regex: https://(.+?).blob.core.windows.net/(.+)
+  - regex: https://(.+?).file.core.windows.net/(.+)
+  - regex: https?://(.+)/(.+)
+
+# Kserve controller values
+kserveControllerManager:
+  kubeRbacProxy:
+    image:
+      repository: gcr.io/kubebuilder/kube-rbac-proxy
+      tag: v0.13.1
+  manager:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+    image:
+      repository: kserve/kserve-controller
+      tag: v0.12.1
+    resources:
+      limits:
+        cpu: 100m
+        memory: 300Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi

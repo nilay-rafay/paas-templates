@@ -1,0 +1,240 @@
+knativeConfigDeployment:
+  Example: |-
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that `kubectl edit` this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+    # List of repositories for which tag to digest resolving should be skipped
+    registries-skipping-tag-resolving: "kind.local,ko.local,dev.local"
+    # Maximum time allowed for an image's digests to be resolved.
+    digest-resolution-timeout: "10s"
+    # Duration we wait for the deployment to be ready before considering it failed.
+    progress-deadline: "600s"
+    # Sets the queue proxy's CPU request.
+    # If omitted, a default value (currently "25m"), is used.
+    queue-sidecar-cpu-request: "25m"
+    # Sets the queue proxy's CPU limit.
+    # If omitted, no value is specified and the system default is used.
+    queue-sidecar-cpu-limit: "1000m"
+    # Sets the queue proxy's memory request.
+    # If omitted, no value is specified and the system default is used.
+    queue-sidecar-memory-request: "400Mi"
+    # Sets the queue proxy's memory limit.
+    # If omitted, no value is specified and the system default is used.
+    queue-sidecar-memory-limit: "800Mi"
+    # Sets the queue proxy's ephemeral storage request.
+    # If omitted, no value is specified and the system default is used.
+    queue-sidecar-ephemeral-storage-request: "512Mi"
+    # Sets the queue proxy's ephemeral storage limit.
+    # If omitted, no value is specified and the system default is used.
+    queue-sidecar-ephemeral-storage-limit: "1024Mi"
+    # Sets tokens associated with specific audiences for queue proxy - used by QPOptions
+    #
+    # For example, to add the `service-x` audience:
+    #    queue-sidecar-token-audiences: "service-x"
+    # Also supports a list of audiences, for example:
+    #    queue-sidecar-token-audiences: "service-x,service-y"
+    # If omitted, or empty, no tokens are created
+    queue-sidecar-token-audiences: ""
+    # Sets rootCA for the queue proxy - used by QPOptions
+    # If omitted, or empty, no rootCA is added to the golang rootCAs
+    queue-sidecar-rootca: ""
+  progressDeadline: 600s
+  queueSidecarImage: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:dabaecec38860ca4c972e6821d5dc825549faf50c6feb8feb4c04802f2338b8a
+
+# knative activator values
+knativeActivator:
+  activator:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/serving/cmd/activator@sha256
+      tag: c2994c2b6c2c7f38ad1b85c71789bf1753cc8979926423c83231e62258837cb9
+    resources:
+      limits:
+        cpu: "1"
+        memory: 600Mi
+      requests:
+        cpu: 300m
+        memory: 60Mi
+
+# knative autoscaler values
+knativeAutoscaler:
+  autoscaler:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler@sha256
+      tag: 8319aa662b4912e8175018bd7cc90c63838562a27515197b803bdcd5634c7007
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1000Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+
+# knative controller values
+knativeController:
+  controller:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/serving/cmd/controller@sha256
+      tag: 98a2cc7fd62ee95e137116504e7166c32c65efef42c3d1454630780410abf943
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1000Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+
+# knative domainMapping values
+knativeDomainMapping:
+  domainMapping:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/serving/cmd/domain-mapping@sha256
+      tag: f66c41ad7a73f5d4f4bdfec4294d5459c477f09f3ce52934d1a215e32316b59b
+    resources:
+      limits:
+        cpu: 300m
+        memory: 400Mi
+      requests:
+        cpu: 30m
+        memory: 40Mi
+
+# knative domainmappingWebhook values
+knativeDomainmappingWebhook:
+  domainmappingWebhook:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/serving/cmd/domain-mapping-webhook@sha256
+      tag: 7368aaddf2be8d8784dc7195f5bc272ecfe49d429697f48de0ddc44f278167aa
+    resources:
+      limits:
+        cpu: 500m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+
+# knative netIstioController values
+knativeNetIstioController:
+  controller:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/net-istio/cmd/controller@sha256
+      tag: 421aa67057240fa0c56ebf2c6e5b482a12842005805c46e067129402d1751220
+    resources:
+      limits:
+        cpu: 300m
+        memory: 400Mi
+      requests:
+        cpu: 30m
+        memory: 40Mi
+
+# knative netIstioWebhook values
+knativeNetIstioWebhook:
+  webhook:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/net-istio/cmd/webhook@sha256
+      tag: bfa1dfea77aff6dfa7959f4822d8e61c4f7933053874cd3f27352323e6ecd985
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 20m
+        memory: 20Mi
+
+# knative webhook values
+knativeWebhook:
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  image:
+    repository: gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256
+    tag: 4305209ce498caf783f39c8f3e85dfa635ece6947033bf50b0b627983fd65953
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+
+# knative queueProxy values
+knativeQueueProxy:
+  image:
+    repository: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256
+    tag: dabaecec38860ca4c972e6821d5dc825549faf50c6feb8feb4c04802f2338b8a

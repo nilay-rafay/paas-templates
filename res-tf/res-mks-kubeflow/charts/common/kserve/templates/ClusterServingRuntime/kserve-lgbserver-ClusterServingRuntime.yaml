@@ -1,0 +1,20 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-lgbserver
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8080'
+  containers:
+  - args:
+    - '--model_name={{`{{.Name}}`}}'
+    - --model_dir=/mnt/models
+    - --http_port=8080
+    - --nthread=1
+    image: {{ .Values.kserveLgbserver.kserveContainer.image.repository 
+      }}:{{ .Values.kserveLgbserver.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kserveLgbserver.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kserveLgbserver.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kserveLgbserver.supportedModelFormats | nindent 2 }} 

@@ -1,0 +1,158 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: triggers.eventing.knative.dev
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: "1.12.6"
+    knative.dev/crd-install: "true"
+    kustomize.component: knative
+spec:
+  group: eventing.knative.dev
+  names:
+    kind: Trigger
+    plural: triggers
+    singular: trigger
+    categories:
+      - all
+      - knative
+      - eventing
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Broker
+          type: string
+          jsonPath: .spec.broker
+        - name: Subscriber_URI
+          type: string
+          jsonPath: .status.subscriberUri
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+        - name: Ready
+          type: string
+          jsonPath: .status.conditions[?(@.type=="Ready")].status
+        - name: Reason
+          type: string
+          jsonPath: .status.conditions[?(@.type=="Ready")].reason
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: >
+            Trigger represents a request to have events delivered to a subscriber
+            from a Broker's event pool.
+          properties:
+            spec:
+              type: object
+              description: Desired state of the Trigger.
+              properties:
+                broker:
+                  type: string
+                  description: Broker from which this Trigger receives events.
+                delivery:
+                  type: object
+                  description: Delivery spec for this specific Trigger.
+                  properties:
+                    backoffDelay:
+                      type: string
+                      description: >
+                        Delay before retrying. Supports ISO-8601 duration format.
+                    backoffPolicy:
+                      type: string
+                      description: Backoff policy for retries (linear or exponential).
+                    retry:
+                      type: integer
+                      format: int32
+                      description: Minimum number of retries before moving to the dead letter sink.
+                    deadLetterSink:
+                      type: object
+                      description: Sink for events that couldn't be delivered.
+                      properties:
+                        ref:
+                          type: object
+                          description: Reference to an Addressable resource.
+                          properties:
+                            apiVersion:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                        uri:
+                          type: string
+                          description: URI of the dead letter sink.
+                filter:
+                  type: object
+                  description: >
+                    Filter to apply to events from the Broker. Events passing the
+                    filter are sent to the Subscriber.
+                  properties:
+                    attributes:
+                      type: object
+                      description: >
+                        Attributes to filter events by exact match on event context
+                        attributes. Supports only string values.
+                      x-kubernetes-preserve-unknown-fields: true
+                subscriber:
+                  type: object
+                  description: >
+                    Subscriber is the addressable that receives events from the
+                    Broker that pass the filter.
+                  properties:
+                    ref:
+                      type: object
+                      description: Reference to an Addressable resource.
+                      properties:
+                        apiVersion:
+                          type: string
+                        kind:
+                          type: string
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                    uri:
+                      type: string
+                      description: URI of the subscriber.
+            status:
+              type: object
+              description: Current state of the Trigger.
+              properties:
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: Generation last processed by the controller.
+                subscriberUri:
+                  type: string
+                  description: Resolved URI of the subscriber.
+                deadLetterSinkUri:
+                  type: string
+                  description: Resolved URI of the dead letter sink.
+                conditions:
+                  type: array
+                  description: Latest state observations.
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                annotations:
+                  type: object
+                  description: Additional status fields for the resource.
+                  x-kubernetes-preserve-unknown-fields: true
+  subresources:
+    status: {}

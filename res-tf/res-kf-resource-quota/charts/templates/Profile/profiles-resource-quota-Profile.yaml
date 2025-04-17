@@ -1,0 +1,16 @@
+apiVersion: kubeflow.org/v1
+kind: Profile
+metadata:
+  name: ${kubeflow_namespace_name} # This is the actual namespace name
+spec:
+  owner:
+    kind: User
+    name: ${kubeflow_user_email}
+  resourceQuotaSpec:
+    hard:
+      requests.cpu: "${kubeflow_requests_cpu}"
+      requests.memory: "${kubeflow_requests_memory}"
+      requests.storage: "${kubeflow_requests_storage}"
+      limits.cpu: "${kubeflow_limit_cpu}"
+      limits.memory: "${kubeflow_limit_memory}"
+      ephemeral-storage: "${kubeflow_ephemeral_storage}"

@@ -1,0 +1,47 @@
+head:
+  resources:
+    limits:
+      cpu: ${ head_config["cpu"] }
+      memory: ${ head_config["memory"] }
+    requests:
+      cpu: ${ head_config["cpu"] }
+      memory: ${ head_config["memory"] }
+  image:
+    repository: ${ head_config["repository"] }
+    tag: ${ head_config["tag"] }
+  enableInTreeAutoscaling: ${ head_config["enableInTreeAutoscaling"] }
+  rayStartParams:
+    num-cpus: "0"
+    include-dashboard: "True"
+worker:
+  image:
+    repository: ${ worker_config["repository"] }
+    tag: ${ worker_config["tag"] }
+  replicas: ${ worker_config["replicas"] }
+  minReplicas: ${ worker_config["minReplicas"] }
+  maxReplicas: ${ worker_config["maxReplicas"] }
+  resources:
+    limits:
+      cpu: ${ worker_config["cpu"] }
+      memory: ${ worker_config["memory"] }
+      nvidia.com/gpu: ${ worker_config["gpu"] }
+    requests:
+      cpu: ${ worker_config["cpu"] }
+      memory: ${ worker_config["memory"] }
+      nvidia.com/gpu: ${ worker_config["gpu"] }
+  %{ if worker_node_selector != null ~}
+  
+  nodeSelector:
+  %{ for key, value in jsondecode(worker_node_selector) ~}
+  ${ key }: ${ value }
+  %{ endfor ~}
+  %{ endif ~}
+  %{ if worker_tolerations != null ~}
+
+  tolerations:
+  %{ for tol in jsondecode(worker_tolerations) ~}
+- key: ${ tol.key }
+    value: ${ tol.value }
+    effect: ${ tol.effect }
+  %{ endfor ~}
+  %{ endif ~}

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: domain-mapping
+    app.kubernetes.io/name: knative-serving
+    app.kubernetes.io/version: 1.10.2
+  name: domain-mapping
+  namespace: knative-serving
+spec:
+  selector:
+    matchLabels:
+      app: domain-mapping
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+      labels:
+        app: domain-mapping
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.10.2
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: domain-mapping
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_LOGGING_NAME
+          value: config-logging
+        - name: CONFIG_OBSERVABILITY_NAME
+          value: config-observability
+        - name: METRICS_DOMAIN
+          value: knative.dev/serving
+        image: {{ .Values.knativeDomainMapping.domainMapping.image.repository 
+          }}:{{ .Values.knativeDomainMapping.domainMapping.image.tag }}
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health
+            port: probes
+            scheme: HTTP
+          periodSeconds: 5
+        name: domain-mapping
+        ports:
+        - containerPort: 9090
+          name: metrics
+        - containerPort: 8008
+          name: profiling
+        - containerPort: 8080
+          name: probes
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /readiness
+            port: probes
+            scheme: HTTP
+          periodSeconds: 5
+        resources: {{- toYaml .Values.knativeDomainMapping.domainMapping.resources | nindent 10
+          }}
+        securityContext: {{- toYaml .Values.knativeDomainMapping.domainMapping.containerSecurityContext
+          | nindent 10 }}
+      serviceAccountName: controller

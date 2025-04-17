@@ -1,0 +1,21 @@
+apiVersion: "serving.kserve.io/v1alpha1"
+kind: ClusterStorageContainer
+metadata:
+  name: mlflow-initializer
+spec:
+  container:
+    name: storage-initializer
+    image: us-central1-docker.pkg.dev/rafay-labs/ai-ml-repo/mlflow-storage-initializer:2.14.0
+    env:
+    - name: MLFLOW_TRACKING_URI
+      value: "${mlflow_tracking_uri}"
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: "1"
+      limits:
+        memory: 2Gi
+        cpu: "2"
+  supportedUriFormats:
+    - prefix: mlflow-artifacts:/
+    - prefix: models:/

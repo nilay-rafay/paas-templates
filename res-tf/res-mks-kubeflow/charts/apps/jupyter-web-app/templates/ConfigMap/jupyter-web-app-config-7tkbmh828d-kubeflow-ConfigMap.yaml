@@ -1,0 +1,139 @@
+apiVersion: v1
+data:
+  spawner_ui_config.yaml: "# --------------------------------------------------------------\n\
+    # Configuration file for the Kubeflow Notebooks UI.\n#\n# About the `readOnly`\
+    \ configs:\n#  - when `readOnly` is set to \"true\", the respective option\n#\
+    \    will be disabled for users and only set by the admin\n#  - when 'readOnly'\
+    \ is missing, it defaults to 'false'\n# --------------------------------------------------------------\n\
+    \nspawnerFormDefaults:\n  ################################################################\n\
+    \  # Container Images\n  ################################################################\n\
+    \  # if users can input custom images, or only select from dropdowns\n  allowCustomImage:\
+    \ true\n\n  # if the registry of the container image is hidden from display\n\
+    \  hideRegistry: true\n\n  # if the tag of the container image is hidden from\
+    \ display\n  hideTag: false\n\n  # configs for the ImagePullPolicy\n  imagePullPolicy:\n\
+    \    readOnly: false\n\n    # the default ImagePullPolicy\n    # (possible values:\
+    \ \"Always\", \"IfNotPresent\", \"Never\")\n    value: IfNotPresent\n\n  ################################################################\n\
+    \  # Jupyter-like Container Images\n  #\n  # NOTES:\n  #  - the `image` section\
+    \ is used for \"Jupyter-like\" apps whose\n  #    HTTP path is configured by the\
+    \ \"NB_PREFIX\" environment variable\n  ################################################################\n\
+    \  image:\n    # the default container image\n    value: kubeflownotebookswg/jupyter-scipy:v1.8.0\n\
+    \n    # the list of available container images in the dropdown\n    options:\n\
+    \    - kubeflownotebookswg/jupyter-scipy:v1.8.0\n    - kubeflownotebookswg/jupyter-pytorch-full:v1.8.0\n\
+    \    - kubeflownotebookswg/jupyter-pytorch-cuda-full:v1.8.0\n    - kubeflownotebookswg/jupyter-tensorflow-full:v1.8.0\n\
+    \    - kubeflownotebookswg/jupyter-tensorflow-cuda-full:v1.8.0\n\n  ################################################################\n\
+    \  # VSCode-like Container Images (Group 1)\n  #\n  # NOTES:\n  #  - the `imageGroupOne`\
+    \ section is used for \"VSCode-like\" apps that\n  #    expose themselves under\
+    \ the HTTP root path \"/\" and support path\n  #    rewriting without breaking\n\
+    \  #  - the annotation `notebooks.kubeflow.org/http-rewrite-uri: \"/\"` is\n \
+    \ #    set on Notebooks spawned by this group, to make Istio rewrite\n  #    the\
+    \ path of HTTP requests to the HTTP root\n  ################################################################\n\
+    \  imageGroupOne:\n    # the default container image\n    value: kubeflownotebookswg/codeserver-python:v1.8.0\n\
+    \n    # the list of available container images in the dropdown\n    options:\n\
+    \    - kubeflownotebookswg/codeserver-python:v1.8.0\n\n  ################################################################\n\
+    \  # RStudio-like Container Images (Group 2)\n  #\n  # NOTES:\n  #  - the `imageGroupTwo`\
+    \ section is used for \"RStudio-like\" apps whose\n  #    HTTP path is configured\
+    \ by the \"X-RStudio-Root-Path\" header\n  #  - the annotation `notebooks.kubeflow.org/http-rewrite-uri:\
+    \ \"/\"` is\n  #    set on Notebooks spawned by this group, to make Istio rewrite\n\
+    \  #    the path of HTTP requests to the HTTP root\n  #  - the annotation `notebooks.kubeflow.org/http-headers-request-set`\
+    \ is\n  #    set on Notebooks spawned by this group, such that Istio injects the\n\
+    \  #    \"X-RStudio-Root-Path\" header to all request\n  ################################################################\n\
+    \  imageGroupTwo:\n    # the default container image\n    value: kubeflownotebookswg/rstudio-tidyverse:v1.8.0\n\
+    \n    # the list of available container images in the dropdown\n    options:\n\
+    \    - kubeflownotebookswg/rstudio-tidyverse:v1.8.0\n\n  ################################################################\n\
+    \  # CPU Resources\n  ################################################################\n\
+    \  cpu:\n    readOnly: false\n\n    # the default cpu request for the container\n\
+    \    value: \"0.5\"\n\n    # a factor by which to multiply the CPU request calculate\
+    \ the cpu limit\n    # (to disable cpu limits, set as \"none\")\n    limitFactor:\
+    \ \"1.2\"\n\n  ################################################################\n\
+    \  # Memory Resources\n  ################################################################\n\
+    \  memory:\n    readOnly: false\n\n    # the default memory request for the container\n\
+    \    value: \"1.0Gi\"\n\n    # a factor by which to multiply the memory request\
+    \ calculate the memory limit\n    # (to disable memory limits, set as \"none\"\
+    )\n    limitFactor: \"1.2\"\n\n  ################################################################\n\
+    \  # GPU/Device-Plugin Resources\n  ################################################################\n\
+    \  gpus:\n    readOnly: false\n\n    # configs for gpu/device-plugin limits of\
+    \ the container\n    # https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins\n\
+    \    value:\n      # the `limitKey` of the default vendor\n      # (to have no\
+    \ default, set as \"\")\n      vendor: \"\"\n\n      # the list of available vendors\
+    \ in the dropdown\n      #  `limitsKey` - what will be set as the actual limit\n\
+    \      #  `uiName` - what will be displayed in the dropdown UI\n      vendors:\n\
+    \      - limitsKey: \"nvidia.com/gpu\"\n        uiName: \"NVIDIA\"\n      - limitsKey:\
+    \ \"amd.com/gpu\"\n        uiName: \"AMD\"\n\n      # the default value of the\
+    \ limit\n      # (possible values: \"none\", \"1\", \"2\", \"4\", \"8\")\n   \
+    \   num: \"none\"\n\n  ################################################################\n\
+    \  # Workspace Volumes\n  ################################################################\n\
+    \  workspaceVolume:\n    readOnly: false\n\n    # the default workspace volume\
+    \ to be created and mounted\n    # (to have no default, set `value: null`)\n \
+    \   value:\n      mount: /home/jovyan\n\n      # pvc configs for creating new\
+    \ workspace volumes\n      # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#persistentvolumeclaim-v1-core\n\
+    \      newPvc:\n        metadata:\n          # \"{notebook-name}\" is replaced\
+    \ with the Notebook name\n          name: \"{notebook-name}-workspace\"\n    \
+    \    spec:\n          #storageClassName: my-storage-class\n          resources:\n\
+    \            requests:\n              storage: 5Gi\n          accessModes:\n \
+    \         - ReadWriteOnce\n\n  ################################################################\n\
+    \  # Data Volumes\n  ################################################################\n\
+    \  dataVolumes:\n    readOnly: false\n\n    # a list of additional data volumes\
+    \ to be created and/or mounted\n    value: []\n    #value:\n    #  - mount: /home/jovyan/datavol-1\n\
+    \    #    newPvc:\n    #      metadata:\n    #        name: \"{notebook-name}-datavol-1\"\
+    \n    #      spec:\n    #        resources:\n    #          requests:\n    # \
+    \           storage: 5Gi\n    #        accessModes:\n    #          - ReadWriteOnce\n\
+    \    #\n    #  - mount: /home/jovyan/datavol-1\n    #    existingSource:\n   \
+    \ #      persistentVolumeClaim:\n    #        claimName: \"test-pvc\"\n\n  ################################################################\n\
+    \  # Affinity\n  ################################################################\n\
+    \  affinityConfig:\n    readOnly: false\n\n    # the `configKey` of the default\
+    \ affinity config\n    # (to have no default, set as \"\")\n    # (if `readOnly`,\
+    \ the default `value` will be the only accessible option)\n    value: \"\"\n\n\
+    \    # the list of available affinity configs in the dropdown\n    options: []\n\
+    \    #options:\n    #  - configKey: \"dedicated_node_per_notebook\"\n    #   \
+    \ displayName: \"Dedicated Node Per Notebook\"\n    #    affinity:\n    #    \
+    \  # Require a Node with label `lifecycle=kubeflow-notebook`\n    #      nodeAffinity:\n\
+    \    #        requiredDuringSchedulingIgnoredDuringExecution:\n    #         \
+    \ nodeSelectorTerms:\n    #            - matchExpressions:\n    #            \
+    \    - key: \"lifecycle\"\n    #                  operator: \"In\"\n    #    \
+    \              values:\n    #                    - \"kubeflow-notebook\"\n   \
+    \ #\n    #      # Require a Node WITHOUT an existing Pod having `notebook-name`\
+    \ label\n    #      podAntiAffinity:\n    #        requiredDuringSchedulingIgnoredDuringExecution:\n\
+    \    #          - labelSelector:\n    #              matchExpressions:\n    #\
+    \                - key: \"notebook-name\"\n    #                  operator: \"\
+    Exists\"\n    #            topologyKey: \"kubernetes.io/hostname\"\n    #    \
+    \        # WARNING: `namespaceSelector` is Beta in 1.22 and Stable in 1.24,\n\
+    \    #            #          setting to {} is required for affinity to work across\
+    \ Namespaces\n    #            namespaceSelector: {}\n\n  ################################################################\n\
+    \  # Tolerations\n  ################################################################\n\
+    \  tolerationGroup:\n    readOnly: false\n\n    # the `groupKey` of the default\
+    \ toleration group\n    # (to have no default, set as \"\")\n    # (if `readOnly`,\
+    \ the default `value` will be the only accessible option)\n    value: \"\"\n\n\
+    \    # the list of available toleration groups in the dropdown\n    options: []\n\
+    \    #options:\n    #  - groupKey: \"group_1\"\n    #    displayName: \"4 CPU\
+    \ 8Gb Mem at ~$X.XXX USD per day\"\n    #    tolerations:\n    #      - key: \"\
+    dedicated\"\n    #        operator: \"Equal\"\n    #        value: \"kubeflow-c5.xlarge\"\
+    \n    #        effect: \"NoSchedule\"\n    #\n    #  - groupKey: \"group_2\"\n\
+    \    #    displayName: \"8 CPU 16Gb Mem at ~$X.XXX USD per day\"\n    #    tolerations:\n\
+    \    #      - key: \"dedicated\"\n    #        operator: \"Equal\"\n    #    \
+    \    value: \"kubeflow-c5.2xlarge\"\n    #        effect: \"NoSchedule\"\n   \
+    \ #\n    #  - groupKey: \"group_3\"\n    #    displayName: \"16 CPU 32Gb Mem at\
+    \ ~$X.XXX USD per day\"\n    #    tolerations:\n    #      - key: \"dedicated\"\
+    \n    #        operator: \"Equal\"\n    #        value: \"kubeflow-c5.4xlarge\"\
+    \n    #        effect: \"NoSchedule\"\n    #\n    #  - groupKey: \"group_4\"\n\
+    \    #    displayName: \"32 CPU 256Gb Mem at ~$X.XXX USD per day\"\n    #    tolerations:\n\
+    \    #      - key: \"dedicated\"\n    #        operator: \"Equal\"\n    #    \
+    \    value: \"kubeflow-r5.8xlarge\"\n    #        effect: \"NoSchedule\"\n\n \
+    \ ################################################################\n  # Shared\
+    \ Memory\n  ################################################################\n\
+    \  shm:\n    readOnly: false\n\n    # the default state of the \"Enable Shared\
+    \ Memory\" toggle\n    value: true\n\n  ################################################################\n\
+    \  # PodDefaults\n  ################################################################\n\
+    \  configurations:\n    readOnly: false\n\n    # the list of PodDefault names\
+    \ that are selected by default\n    # (take care to ensure these PodDefaults exist\
+    \ in Profile Namespaces)\n    value: []\n    #value:\n    #  - my-pod-default\n\
+    \n  ################################################################\n  # Environment\n\
+    \  #\n  # NOTE:\n  #  - these configs are only used by the ROK \"flavor\" of the\
+    \ UI\n  ################################################################\n  environment:\n\
+    \    readOnly: false\n    value: {}\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app: jupyter-web-app
+    kustomize.component: jupyter-web-app
+  name: jupyter-web-app-config-7tkbmh828d
+  namespace: kubeflow

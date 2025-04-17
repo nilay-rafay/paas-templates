@@ -1,0 +1,9 @@
+kataDeploy:
+  enabled: true
+  namespace: "kube-system"
+  image: "quay.io/kata-containers/kata-deploy:3.15.0"
+
+admissionController:
+  enabled: true
+  namespace: "kube-system"
+  image: "eaasunittest/k8s-admission-controller:v0.1"

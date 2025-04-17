@@ -1,0 +1,66 @@
+# knative eventingcontroller values
+eventingController:
+  eventingController:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    env:
+      apiserverRaImage: gcr.io/knative-releases/knative.dev/eventing/cmd/apiserver_receive_adapter@sha256:828db8155996e40c13b77c1d039dba98153dcfcbe272248e92866bd7b6d6a17d
+    image:
+      repository: gcr.io/knative-releases/knative.dev/eventing/cmd/controller@sha256
+      tag: 92967bab4ad8f7d55ce3a77ba8868f3f2ce173c010958c28b9a690964ad6ee9b
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+# knative eventingwebhook values
+eventingWebhook:
+  eventingWebhook:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/eventing/cmd/webhook@sha256
+      tag: ebf93652f0254ac56600bedf4a7d81611b3e1e7f6526c6998da5dd24cdc67ee1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 50Mi
+# knative pingsourceMtAdapter values
+pingsourceMtAdapter:
+  dispatcher:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    image:
+      repository: gcr.io/knative-releases/knative.dev/eventing/cmd/mtping@sha256
+      tag: 6d35cc98baa098fc0c5b4290859e363a8350a9dadc31d1191b0b5c9796958223
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 125m
+        memory: 64Mi
+  replicas: 0

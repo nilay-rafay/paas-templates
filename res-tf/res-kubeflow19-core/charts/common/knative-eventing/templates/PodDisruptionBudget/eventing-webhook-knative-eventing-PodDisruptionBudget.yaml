@@ -1,0 +1,18 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: 1.12.6
+    kustomize.component: knative
+  name: eventing-webhook
+  namespace: knative-eventing
+spec:
+  minAvailable: 80%
+  selector:
+    matchLabels:
+      app: eventing-webhook
+      app.kubernetes.io/component: knative-eventing
+      app.kubernetes.io/name: knative-eventing
+      kustomize.component: knative

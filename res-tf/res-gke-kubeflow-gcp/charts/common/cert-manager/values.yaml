@@ -1,0 +1,42 @@
+# certManagerCainjector configuaration
+certManagerCainjector:
+  certManagerCainjector:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    image:
+      repository: quay.io/jetstack/cert-manager-cainjector
+      tag: v1.12.2
+  replicas: 1
+# certManager configuration
+certManager:
+  certManagerController:
+    args:
+    - --v=2
+    - --cluster-resource-namespace=$(POD_NAMESPACE)
+    - --leader-election-namespace=kube-system
+    - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.12.2
+    - --max-concurrent-challenges=60
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    image:
+      repository: quay.io/jetstack/cert-manager-controller
+      tag: v1.12.2
+  replicas: 1
+# certManagerWebhook configuration
+certManagerWebhook:
+  certManagerWebhook:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    image:
+      repository: quay.io/jetstack/cert-manager-webhook
+      tag: v1.12.2
+  replicas: 1

@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: patch-pod-runtime-class
+ namespace: {{ .Values.admissionController.namespace }}
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: patch-pod-runtime-class
+ template:
+   metadata:
+     labels:
+       app: patch-pod-runtime-class
+   spec:
+     serviceAccountName: patch-pod-runtime-class-sa
+     containers:
+       - name: patch-pod-runtime-class
+         image: {{ .Values.admissionController.image }}
+         imagePullPolicy: Always
+         env:
+           - name: CONFIG_PATH
+             valueFrom:
+               configMapKeyRef:
+                 name: patch-pod-runtime-class-cm
+                 key: config.path
+           - name: CONFIG_CERT_PATH
+             valueFrom:
+               configMapKeyRef:
+                 name: patch-pod-runtime-class-cm
+                 key: config.cert.path
+           - name: CONFIG_KEY_PATH
+             valueFrom:
+               configMapKeyRef:
+                 name: patch-pod-runtime-class-cm
+                 key: config.cert.key.path
+         ports:
+           - containerPort: 7443
+         resources:
+           limits:
+             cpu: 100m
+             memory: 128Mi
+           requests:
+             cpu: 100m
+             memory: 128Mi
+         volumeMounts:
+           - name: webhook-certs
+             mountPath: /etc/webhook/certs
+             readOnly: true
+           - name: config
+             mountPath: /etc/webhook
+             readOnly: true
+     volumes:
+       - name: webhook-certs
+         secret:
+           secretName: patch-pod-runtime-class-secret
+       - name: config
+         configMap:
+           name: patch-pod-runtime-class-cm

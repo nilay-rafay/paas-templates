@@ -1,0 +1,179 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: subscriptions.messaging.knative.dev
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: "1.12.6"
+    knative.dev/crd-install: "true"
+    kustomize.component: knative
+spec:
+  group: messaging.knative.dev
+  names:
+    kind: Subscription
+    plural: subscriptions
+    singular: subscription
+    shortNames:
+      - sub
+    categories:
+      - all
+      - knative
+      - messaging
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+        - jsonPath: .status.conditions[?(@.type=="Ready")].status
+          name: Ready
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Ready")].reason
+          name: Reason
+          type: string
+      schema:
+        openAPIV3Schema:
+          description: >
+            Subscription routes events received on a Channel to a DNS name
+            and corresponds to the subscriptions.channels.knative.dev CRD.
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                channel:
+                  description: >
+                    Reference to a channel that will be used to create the subscription.
+                    This is immutable. Only the following fields of the KReference
+                    are allowed: kind, apiVersion, and name.
+                  type: object
+                  properties:
+                    apiVersion:
+                      type: string
+                    kind:
+                      type: string
+                    name:
+                      type: string
+                delivery:
+                  description: Configuration for message delivery.
+                  type: object
+                  properties:
+                    backoffDelay:
+                      type: string
+                      description: >
+                        Delay before retrying. Supports ISO-8601 duration format.
+                    backoffPolicy:
+                      type: string
+                      description: Retry backoff policy (linear or exponential).
+                    deadLetterSink:
+                      type: object
+                      description: Sink to receive events that could not be sent to the destination.
+                      properties:
+                        ref:
+                          type: object
+                          description: Reference to an Addressable resource.
+                          properties:
+                            apiVersion:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                        uri:
+                          type: string
+                          description: URI of the sink (absolute or relative).
+                    retry:
+                      type: integer
+                      format: int32
+                      description: Minimum number of retries before sending events to the dead letter sink.
+                reply:
+                  description: >
+                    Specifies how to handle events returned from the Subscriber target.
+                  type: object
+                  properties:
+                    ref:
+                      type: object
+                      description: Reference to an Addressable resource.
+                      properties:
+                        apiVersion:
+                          type: string
+                        kind:
+                          type: string
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                    uri:
+                      type: string
+                      description: URI for replies (absolute or relative).
+                subscriber:
+                  description: >
+                    Reference to the target for processing events. Replies are sent to the destination specified by `reply`.
+                  type: object
+                  properties:
+                    ref:
+                      type: object
+                      description: Reference to an Addressable resource.
+                      properties:
+                        apiVersion:
+                          type: string
+                        kind:
+                          type: string
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                    uri:
+                      type: string
+                      description: URI for the subscriber (absolute or relative).
+            status:
+              type: object
+              properties:
+                annotations:
+                  type: object
+                  description: >
+                    Additional fields for the resource status.
+                  x-kubernetes-preserve-unknown-fields: true
+                conditions:
+                  type: array
+                  description: >
+                    Latest observed state of the resource.
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: >
+                    Last generation observed by the controller.
+                physicalSubscription:
+                  type: object
+                  description: Resolved values representing this subscription.
+                  properties:
+                    deadLetterSinkUri:
+                      type: string
+                      description: URI for the dead letter sink.
+                    replyUri:
+                      type: string
+                      description: Fully resolved URI for the reply.
+                    subscriberUri:
+                      type: string
+                      description: Fully resolved URI for the subscriber.
+  subresources:
+    status: {}

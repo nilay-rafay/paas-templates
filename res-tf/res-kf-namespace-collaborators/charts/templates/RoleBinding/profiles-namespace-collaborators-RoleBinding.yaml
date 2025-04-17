@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "user-${kubeflow_safe_collaborator_email}-clusterrole-${kubeflow_collaborator_role}"
+  namespace: ${kubeflow_namespace_name}
+  annotations:
+    role: ${kubeflow_collaborator_role}
+    user: ${kubeflow_raw_collaborator_email}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "kubeflow-${kubeflow_collaborator_role}"
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: ${kubeflow_raw_collaborator_email}

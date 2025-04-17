@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: patch-pod-runtime-class-cm
+ namespace: {{ .Values.admissionController.namespace }}
+data:
+ config.path: "/etc/webhook/config.yaml"
+ config.cert.path: "/etc/webhook/certs/tls.crt"
+ config.cert.key.path: "/etc/webhook/certs/tls.key"
+ config.yaml: |
+   config:
+     namespace_label_selector: "runtimeClassName=kata"
+     kind: "Pod"
+     webhook_endpoint: "/patch"
+     webhook_port: 7443
+     patch: |
+       [
+         {
+           "op": "add",
+           "path": "/spec/runtimeClassName",
+           "value": "kata-qemu"
+         }
+       ]

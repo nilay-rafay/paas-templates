@@ -1,0 +1,22 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-tritonserver
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8002'
+  containers:
+  - args:
+    - tritonserver
+    - --model-store=/mnt/models
+    - --grpc-port=9000
+    - --http-port=8080
+    - --allow-grpc=true
+    - --allow-http=true
+    image: {{ .Values.kserveTritonserver.kserveContainer.image.repository 
+      }}:{{ .Values.kserveTritonserver.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kserveTritonserver.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kserveTritonserver.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kserveTritonserver.supportedModelFormats | nindent 2 }}

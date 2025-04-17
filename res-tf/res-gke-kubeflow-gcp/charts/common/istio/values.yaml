@@ -1,0 +1,18 @@
+istio:
+  host: '*'
+  tls:
+    crt: ''
+    key: ''
+# istioIngressgateway configuration
+istioIngressgateway:
+  istioProxy:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+  istiosvc:
+    type: ClusterIP
+    annotations: {}

@@ -1,0 +1,26 @@
+# Plugin Definition below. This is essentially a valid helm values file that will be merged
+# with the other vcluster values during vcluster create or helm install.
+plugins:
+  rafay-kubevirt:
+    image: registry.dev.rafay-edge.net/dev/rafay-kubevirt:20250417164707
+    imagePullPolicy: IfNotPresent
+    rbac:
+      role:
+        extraRules:
+          - apiGroups: ["kubevirt.io"]
+            resources: ["*"]
+            verbs:
+              ["*"]
+          - apiGroups: [""]
+            resources: ["services"]
+            verbs: ["get", "list", "watch"]
+      clusterRole:
+        extraRules:
+          - apiGroups: ["apiextensions.k8s.io"]
+            resources: ["customresourcedefinitions"]
+            verbs: ["*"]
+# Make sure the cluster role is enabled or otherwise the plugin won't be able to watch custom
+# resource definitions.
+rbac:
+  clusterRole:
+    enabled: true

@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  _example: {{ .Values.knativeConfigDeployment.Example | toYaml | indent 1 }}
+  progressDeadline: {{ .Values.knativeConfigDeployment.progressDeadline | quote }}
+  queue-sidecar-image: {{ .Values.knativeConfigDeployment.queueSidecarImage | quote }}
+kind: ConfigMap
+metadata:
+  annotations:
+    knative.dev/example-checksum: 410041a0
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/name: knative-serving
+    app.kubernetes.io/version: 1.10.2
+  name: config-deployment
+  namespace: knative-serving

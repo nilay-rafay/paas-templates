@@ -1,0 +1,10 @@
+profilesDeployment:
+  kfam:
+    image:
+      repository: docker.io/kubeflownotebookswg/kfam
+      tag: v1.9.0
+  manager:
+    image:
+      repository: docker.io/kubeflownotebookswg/profile-controller
+      tag: v1.9.0
+  replicas: 1

@@ -1,0 +1,24 @@
+apiVersion: v1
+data:
+  viewer-spec.yaml: "# Note: the volumes-web-app allows expanding strings using ${VAR_NAME}\n\
+    # You may use any environment variable. This lets us e.g. specify images that\
+    \ can be modified using kustomize's image transformer.\n# Additionally, 'PVC_NAME',\
+    \ 'NAME' and 'NAMESPACE' are defined\n# Name of the pvc is set by the volumes\
+    \ web app\npvc: $NAME\npodTemplate:\n  containers:\n    - name: main\n      image:\
+    \ $VOLUME_VIEWER_IMAGE\n      env:\n        - name: FB_ADDRESS\n          value:\
+    \ \"0.0.0.0\"\n        - name: FB_PORT\n          value: \"8080\"\n        - name:\
+    \ FB_DATABASE\n          value: /tmp/filebrowser.db\n        - name: FB_NOAUTH\n\
+    \          value: \"true\"\n        - name: FB_BASEURL\n          value: /pvcviewers/$NAMESPACE/$NAME/\n\
+    \      readinessProbe:\n        tcpSocket:\n          port: 8080\n        initialDelaySeconds:\
+    \ 2\n        periodSeconds: 10\n      # viewer-volume is provided automatically\
+    \ by the volumes web app\n      volumeMounts:\n        - name: viewer-volume\n\
+    \          mountPath: /data\n      workingDir: /data\n      serviceAccountName:\
+    \ default-editor\nnetworking:\n  targetPort: 8080\n  basePrefix: \"/pvcviewers\"\
+    \n  rewrite: \"/\"\n  timeout: 30s\nrwoScheduling: true"
+kind: ConfigMap
+metadata:
+  labels:
+    app: volumes-web-app
+    kustomize.component: volumes-web-app
+  name: volumes-web-app-viewer-spec-ck6bhh4bdm
+  namespace: kubeflow

@@ -1,0 +1,9 @@
+# Default values for training-operator.
+trainingOperator:
+  replicas: 1
+  trainingOperator:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+    image:
+      repository: kubeflow/training-operator
+      tag: v1-9e52eb7

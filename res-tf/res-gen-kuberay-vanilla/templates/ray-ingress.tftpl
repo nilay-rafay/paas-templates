@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ray-dashboard-${cluster_name}
+spec:
+  ingressClassName: ${ingress_class}
+  tls:
+  - hosts:
+    - ${ingress_full_domain}
+    secretName: ${secret_name}
+  rules:
+  -  host: ${ingress_full_domain}
+     http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ${service_name}
+            port:
+              number: 8265

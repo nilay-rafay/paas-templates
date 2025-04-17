@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: 1.12.6
+    duck.knative.dev/channelable: 'true'
+    kustomize.component: knative
+  name: meta-channelable-manipulator
+rules:
+- apiGroups:
+  - messaging.knative.dev
+  resources:
+  - channels
+  - channels/status
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete

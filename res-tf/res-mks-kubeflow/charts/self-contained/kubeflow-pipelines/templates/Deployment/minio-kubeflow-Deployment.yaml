@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minio
+    application-crd-id: kubeflow-pipelines
+  name: minio
+  namespace: kubeflow
+spec:
+  selector:
+    matchLabels:
+      app: minio
+      application-crd-id: kubeflow-pipelines
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+        application-crd-id: kubeflow-pipelines
+    spec:
+      containers:
+      - args:
+        - server
+        - /data
+        env:
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: accesskey
+              name: mlpipeline-minio-artifact
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: secretkey
+              name: mlpipeline-minio-artifact
+        image: {{ .Values.minio.minio.image.repository 
+          }}:{{ .Values.minio.minio.image.tag }}
+        name: minio
+        ports:
+        - containerPort: 9000
+        resources: {{- toYaml .Values.minio.minio.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /data
+          name: data
+          subPath: minio
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio-pvc

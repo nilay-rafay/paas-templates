@@ -1,0 +1,30 @@
+postInstall:
+  labelNamespace:
+    image:
+      repository: ${registry_fqdn}/rafay/openpolicyagent/gatekeeper-crds
+  probeWebhook:
+    image:
+      repository: curlimages/curl
+postUpgrade:
+  labelNamespace:
+    enabled: false
+    image:
+      repository: ${registry_fqdn}/rafay/openpolicyagent/gatekeeper-crds
+preUninstall:
+  deleteWebhookConfigurations:
+    image:
+      repository: ${registry_fqdn}/rafay/openpolicyagent/gatekeeper-crds
+image:
+  repository: ${registry_fqdn}/rafay/openpolicyagent/gatekeeper
+  crdRepository: ${registry_fqdn}/rafay/openpolicyagent/gatekeeper-crds
+  fluentbit: ${registry_fqdn}/fluent/fluent-bit:3.1.6
+fluentdAggr: ${fluentd_aggr_fqdn}
+podLabels:
+%{ for key, value in podLabels }
+  ${key}: "${value}"
+%{ endfor }
+%{ if length(excludedNamespaces) > 0 }
+excludedNamespaces: 
+ - excludedNamespaces: ${excludedNamespaces}
+   processes: [ "*" ]
+%{ endif }

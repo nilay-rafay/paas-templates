@@ -1,0 +1,117 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: channels.messaging.knative.dev
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: 1.12.6
+    duck.knative.dev/addressable: 'true'
+    kustomize.component: knative
+    messaging.knative.dev/subscribable: 'true'
+spec:
+  group: messaging.knative.dev
+  names:
+    kind: Channel
+    plural: channels
+    singular: channel
+    shortNames:
+      - ch
+    categories:
+      - all
+      - knative
+      - messaging
+      - channel
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          description: Channel represents a generic Channel. It is normally used when
+            we want a Channel, but do not need a specific Channel implementation.
+          type: object
+          properties:
+            spec:
+              description: Spec defines the desired state of the Channel.
+              type: object
+              properties:
+                channelTemplate:
+                  description: ChannelTemplate specifies which Channel CRD to use to
+                    create the CRD Channel backing this Channel.
+                  type: object
+                  properties:
+                    apiVersion:
+                      description: API version of the Channel template.
+                      type: string
+                    kind:
+                      description: Kind of the Channel template.
+                      type: string
+                    spec:
+                      description: Specification of the Channel template.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                delivery:
+                  description: DeliverySpec contains the default delivery spec for each
+                    subscription to this Channelable.
+                  type: object
+                  properties:
+                    backoffPolicy:
+                      description: BackoffPolicy is the retry backoff policy.
+                      type: string
+                    backoffDelay:
+                      description: BackoffDelay is the delay before retrying.
+                      type: string
+                    retry:
+                      description: Retry is the minimum number of retries.
+                      type: integer
+                      format: int32
+                    deadLetterSink:
+                      description: DeadLetterSink is the sink receiving events that
+                        could not be sent to a destination.
+                      type: object
+                      properties:
+                        ref:
+                          type: object
+                          description: Reference to an addressable resource.
+                          properties:
+                            apiVersion:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                        uri:
+                          type: string
+            status:
+              description: Status represents the current state of the Channel.
+              type: object
+              properties:
+                conditions:
+                  description: Conditions are the latest observations of a resource's state.
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                observedGeneration:
+                  type: integer
+                  format: int64
+                address:
+                  description: Address is the endpoint of the Channel.
+                  type: object
+                  properties:
+                    url:
+                      type: string
+  subresources:
+    status: {}

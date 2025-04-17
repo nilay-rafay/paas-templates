@@ -1,0 +1,8 @@
+### Kubeflow KServe ###
+# The following values are used to configure the kserve models-web-app deployment
+kserveModelsWebApp:
+  kserveModelsWebApp:
+    image:
+      repository: kserve/models-web-app
+      tag: v0.10.0
+  replicas: 1

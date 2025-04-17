@@ -1,0 +1,19 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-paddleserver
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8080'
+  containers:
+  - args:
+    - '--model_name={{`{{.Name}}`}}'
+    - --model_dir=/mnt/models
+    - --http_port=8080
+    image: {{ .Values.kservePaddleserver.kserveContainer.image.repository 
+      }}:{{ .Values.kservePaddleserver.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kservePaddleserver.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kservePaddleserver.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kservePaddleserver.supportedModelFormats | nindent 2 }}

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    application-crd-id: kubeflow-pipelines
+    component: metadata-envoy
+  name: metadata-envoy-deployment
+  namespace: kubeflow
+spec:
+  replicas: {{ .Values.metadataEnvoyDeployment.replicas }}
+  selector:
+    matchLabels:
+      application-crd-id: kubeflow-pipelines
+      component: metadata-envoy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
+      labels:
+        application-crd-id: kubeflow-pipelines
+        component: metadata-envoy
+    spec:
+      containers:
+      - image: {{ .Values.metadataEnvoyDeployment.container.image.repository 
+          }}:{{ .Values.metadataEnvoyDeployment.container.image.tag }}
+        name: container
+        ports:
+        - containerPort: 9090
+          name: md-envoy
+        - containerPort: 9901
+          name: envoy-admin

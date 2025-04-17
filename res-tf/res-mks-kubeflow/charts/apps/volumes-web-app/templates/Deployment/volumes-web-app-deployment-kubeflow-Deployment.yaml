@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: volumes-web-app
+    kustomize.component: volumes-web-app
+  name: volumes-web-app-deployment
+  namespace: kubeflow
+spec:
+  replicas: {{ .Values.volumesWebAppDeployment.replicas }}
+  selector:
+    matchLabels:
+      app: volumes-web-app
+      kustomize.component: volumes-web-app
+  template:
+    metadata:
+      labels:
+        app: volumes-web-app
+        kustomize.component: volumes-web-app
+    spec:
+      containers:
+      - env:
+        - name: APP_PREFIX
+          value: /volumes
+        - name: USERID_HEADER
+          value: kubeflow-userid
+        - name: USERID_PREFIX
+          value: ''
+        - name: APP_SECURE_COOKIES
+          value: 'true'
+        - name: VOLUME_VIEWER_IMAGE
+          value: {{ quote .Values.volumesWebAppDeployment.volumesWebApp.env.volumeViewerImage
+            }}
+        image: {{ .Values.volumesWebAppDeployment.volumesWebApp.image.repository 
+          }}:{{ .Values.volumesWebAppDeployment.volumesWebApp.image.tag }}
+        name: volumes-web-app
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: /etc/config/viewer-spec.yaml
+          name: viewer-spec
+          subPath: viewer-spec.yaml
+      serviceAccountName: volumes-web-app-service-account
+      volumes:
+      - configMap:
+          name: volumes-web-app-viewer-spec-ck6bhh4bdm
+        name: viewer-spec

@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterStorageContainer
+metadata:
+  name: default
+spec:
+  container:
+    image: {{ .Values.default.storageInitializer.image.repository 
+      }}:{{ .Values.default.storageInitializer.image.tag }}
+    name: storage-initializer
+    resources: {{- toYaml .Values.default.storageInitializer.resources | nindent 6 }}
+  supportedUriFormats: {{- toYaml .Values.default.supportedUriFormats | nindent 2 }}

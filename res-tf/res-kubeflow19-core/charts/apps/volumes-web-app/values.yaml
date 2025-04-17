@@ -1,0 +1,9 @@
+# Default values for volumes-web-app.
+volumesWebAppDeployment:
+  replicas: 1
+  volumesWebApp:
+    env:
+      volumeViewerImage: filebrowser/filebrowser:latest
+    image:
+      repository: docker.io/kubeflownotebookswg/volumes-web-app
+      tag: v1.9.0

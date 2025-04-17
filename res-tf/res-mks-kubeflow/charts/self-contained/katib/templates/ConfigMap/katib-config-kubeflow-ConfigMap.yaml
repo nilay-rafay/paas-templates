@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  katib-config.yaml: {{ .Values.katibConfig.katibConfigYaml | toYaml | indent 1 }}
+kind: ConfigMap
+metadata:
+  name: katib-config
+  namespace: kubeflow

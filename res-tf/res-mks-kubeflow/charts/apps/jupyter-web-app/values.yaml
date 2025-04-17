@@ -1,0 +1,6 @@
+jupyterWebAppDeployment:
+  replicas: 1
+  jupyterWebApp:
+    image:
+      repository: docker.io/kubeflownotebookswg/jupyter-web-app
+      tag: v1.8.0

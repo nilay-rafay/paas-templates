@@ -1,0 +1,17 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-huggingfaceserver
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8080'
+  containers:
+  - args:
+    - '--model_name={{`{{.Name}}`}}'
+    image: {{ .Values.kserveHuggingfaceserver.kserveContainer.image.repository 
+      }}:{{ .Values.kserveHuggingfaceserver.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kserveHuggingfaceserver.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kserveHuggingfaceserver.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kserveHuggingfaceserver.supportedModelFormats | nindent 2 }} 

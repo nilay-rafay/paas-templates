@@ -1,0 +1,27 @@
+formatter: "markdown"
+
+output:
+  file: "README.md"
+
+content: |
+  # Terraform GKE Cluster Module
+
+  This module handles GKE cluster for Rafay Environments.
+
+  ## Requirements
+
+  ### Google Cloud authentication
+  This module assumes you already have done [Google Cloud Authentication](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#authentication).
+
+  ### Configure a Service Account
+  In order to execute this module you must have a Service Account with the following project roles:
+
+  - roles/container.clusterAdmin
+
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}

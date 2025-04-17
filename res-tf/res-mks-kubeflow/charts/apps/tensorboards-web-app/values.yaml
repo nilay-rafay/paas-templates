@@ -1,0 +1,6 @@
+tensorboardsWebAppDeployment:
+  replicas: 1
+  tensorboardsWebApp:
+    image:
+      repository: docker.io/kubeflownotebookswg/tensorboards-web-app
+      tag: v1.8.0

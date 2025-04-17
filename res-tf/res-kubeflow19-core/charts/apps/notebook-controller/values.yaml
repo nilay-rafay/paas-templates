@@ -1,0 +1,8 @@
+# Default values for notebook-controller.
+notebookControllerDeployment:
+  manager:
+    image:
+      repository: docker.io/kubeflownotebookswg/notebook-controller
+      tag: v1.9.0
+    enableCulling: true
+    cullIdleTime: 1440

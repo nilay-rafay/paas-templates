@@ -1,0 +1,24 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-mlserver
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8080'
+  containers:
+  - env:
+    - name: MLSERVER_MODEL_IMPLEMENTATION
+      value: '{{`{{.Labels.modelClass}}`}}'
+    - name: MLSERVER_HTTP_PORT
+      value: '8080'
+    - name: MLSERVER_GRPC_PORT
+      value: '9000'
+    - name: MODELS_DIR
+      value: /mnt/models
+    image: {{ .Values.kserveMLserver.kserveContainer.image.repository 
+      }}:{{ .Values.kserveMLserver.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kserveMLserver.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kserveMLserver.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kserveMLserver.supportedModelFormats | nindent 2 }}

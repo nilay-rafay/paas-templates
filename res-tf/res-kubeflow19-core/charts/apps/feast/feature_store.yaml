@@ -1,0 +1,6 @@
+project: rafay
+registry: data/registry.db
+provider: local
+online_store:
+    type: redis
+    connection_string: redis-headless.feast.svc:6379

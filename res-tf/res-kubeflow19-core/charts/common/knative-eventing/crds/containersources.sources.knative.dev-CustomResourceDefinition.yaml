@@ -1,0 +1,129 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: containersources.sources.knative.dev
+  labels:
+    app.kubernetes.io/component: knative-eventing
+    app.kubernetes.io/name: knative-eventing
+    app.kubernetes.io/version: 1.12.6
+    duck.knative.dev/source: "true"
+    eventing.knative.dev/source: "true"
+    knative.dev/crd-install: "true"
+    kustomize.component: knative
+spec:
+  group: sources.knative.dev
+  names:
+    kind: ContainerSource
+    plural: containersources
+    singular: containersource
+    shortNames:
+      - cs
+    categories:
+      - all
+      - knative
+      - sources
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - jsonPath: .status.sinkUri
+          name: Sink
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+        - jsonPath: .status.conditions[?(@.type=="Ready")].status
+          name: Ready
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Ready")].reason
+          name: Reason
+          type: string
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: >
+            ContainerSource is an event source that starts a container image which generates
+            events under certain conditions and sends messages to a sink URI.
+          properties:
+            spec:
+              type: object
+              description: >
+                Spec defines the desired state of the ContainerSource.
+              properties:
+                ceOverrides:
+                  type: object
+                  description: >
+                    CloudEventOverrides defines overrides to control the output format and
+                    modifications of the event sent to the sink.
+                  properties:
+                    extensions:
+                      type: object
+                      description: >
+                        Extensions specify attributes added or overridden on the outbound event.
+                      x-kubernetes-preserve-unknown-fields: true
+                sink:
+                  type: object
+                  description: >
+                    Sink is a reference to an object that will resolve to a URI to use as the sink.
+                  properties:
+                    ref:
+                      type: object
+                      properties:
+                        apiVersion:
+                          type: string
+                          description: API version of the referent.
+                        kind:
+                          type: string
+                          description: Kind of the referent.
+                        name:
+                          type: string
+                          description: Name of the referent.
+                        namespace:
+                          type: string
+                          description: Namespace of the referent.
+                    uri:
+                      type: string
+                      description: URI can be an absolute or relative URL pointing to the sink.
+                template:
+                  type: object
+                  description: >
+                    Template in the shape of Deployment.spec.template to use for the ContainerSource.
+                  x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              description: >
+                Status represents the current state of the ContainerSource.
+              properties:
+                annotations:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                  description: Additional status fields for the resource.
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of condition.
+                      status:
+                        type: string
+                        description: Status of the condition (True, False, Unknown).
+                      reason:
+                        type: string
+                        description: Reason for the condition's last transition.
+                      message:
+                        type: string
+                        description: Human-readable message indicating details about the condition.
+                sinkUri:
+                  type: string
+                  description: >
+                    SinkURI is the current active sink URI that has been configured for the source.
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: Generation of the resource last processed by the controller.
+  subresources:
+    status: {}

@@ -1,0 +1,13 @@
+dex:
+  issuer: "http://dex.auth.svc.cluster.local:5556/dex"
+  staticPasswords:
+  - username: "user@example.com"
+    password: $2y$12$4K/VkmDd1q1Orb3xAt82zu8gk7Ad6ReFR4LCP9UeYE90NLiN9Df72
+  dex:
+    image:
+      repository: ghcr.io/dexidp/dex
+      tag: v2.36.0
+  replicas: 1
+dexOidcClient:
+  oidcClientId: kubeflow-oidc-authservice
+  oidcClientSecret: pUBnBOY80SnXgjibTYM9ZWNzY2xreNGQok

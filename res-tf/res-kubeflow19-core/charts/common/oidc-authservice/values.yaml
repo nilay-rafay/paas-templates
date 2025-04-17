@@ -1,0 +1,9 @@
+oidc:
+  issuer: "http://dex.auth.svc.cluster.local:5556/dex"
+# Kubeflow Istio oidcAuthservice defaults
+oidcAuthservice:
+  authservice:
+    image:
+      repository: docker.io/kubeflowmanifestswg/oidc-authservice
+      tag: e236439
+  replicas: 1

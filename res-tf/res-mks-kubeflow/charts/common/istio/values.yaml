@@ -1,0 +1,47 @@
+istio:
+  host: '*'
+  ingressClassName: default-rafay-nginx
+  tls:
+    cert: ''
+    key: ''
+# istioIngressgateway configuration
+istioIngressgateway:
+  istioProxy:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+    image:
+      repository: docker.io/istio/proxyv2
+      tag: 1.17.5
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  istiosvc:
+    type: ClusterIP
+# Istiod configuration
+istiod:
+  discovery:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 1337
+      runAsNonRoot: true
+      runAsUser: 1337
+    image:
+      repository: docker.io/istio/pilot
+      tag: 1.17.5
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2Gi

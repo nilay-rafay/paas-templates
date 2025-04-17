@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: mlflow-vs
+  namespace: mlflow
+spec:
+  gateways:
+  - kubeflow/kubeflow-gateway
+  hosts:
+  - '*'
+  http:
+  - match:
+    - uri:
+        prefix: /mlflow/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: ${mlflow_service_endpoint}
+        port:
+          number: 80

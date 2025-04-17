@@ -1,0 +1,10 @@
+centraldashboard:
+  replicas: 1
+  centraldashboard:
+    env:
+      registrationFlow: 'true'
+    image:
+      repository: docker.io/kubeflownotebookswg/centraldashboard
+      tag: v1.8.0
+    mlflow:
+      enabled: true

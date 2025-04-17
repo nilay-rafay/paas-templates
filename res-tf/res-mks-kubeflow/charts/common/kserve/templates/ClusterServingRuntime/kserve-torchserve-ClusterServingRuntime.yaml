@@ -1,0 +1,23 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-torchserve
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: '8082'
+  containers:
+  - args:
+    - torchserve
+    - --start
+    - --model-store=/mnt/models/model-store
+    - --ts-config=/mnt/models/config/config.properties
+    env:
+    - name: TS_SERVICE_ENVELOPE
+      value: '{{`{{.Labels.serviceEnvelope}}`}}'
+    image: {{ .Values.kserveTorchserve.kserveContainer.image.repository 
+      }}:{{ .Values.kserveTorchserve.kserveContainer.image.tag }}
+    name: kserve-container
+    resources: {{- toYaml .Values.kserveTorchserve.kserveContainer.resources | nindent 6 }}
+  protocolVersions: {{- toYaml .Values.kserveTorchserve.protocolVersions | nindent 2 }}
+  supportedModelFormats: {{- toYaml .Values.kserveTorchserve.supportedModelFormats | nindent 2 }}

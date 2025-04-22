@@ -1,0 +1,1 @@
+ssh -i <ssh_key> ubuntu@192.168.8.199 -p 32372

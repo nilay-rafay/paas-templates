@@ -1,0 +1,110 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: ${ vm_name }
+  name: ${ vm_name }
+  namespace: ${ namespace }
+spec:
+  runStrategy: ${ run_strategy }
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: ${ vm_name }
+    spec:
+      domain:
+        memory:
+          guest: ${ vm_memory }Gi
+        cpu:
+          model: host-passthrough
+          cores: ${ vm_cpu }
+        devices:
+          interfaces:
+          - name: default
+            macAddress: ${ vm_mac_address }
+            bridge: {}
+          disks:
+          - name: datavolumedisk1
+            disk:
+              bus: virtio
+%{ if additional_storage > 0 ~}
+          - name: datavolumedisk2
+            disk:
+              bus: virtio
+%{ endif ~}
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+%{ if gpu_quotas > 0 ~}
+          gpus:
+%{ for index in range(gpu_quotas) ~}
+          - deviceName: ${ gpu_resource_name }
+            name: ${format("gpu%d",index + 1)}
+%{ endfor ~}
+%{ endif ~}
+        machine:
+          type: ""
+        resources:
+            requests:
+                memory: ${ vm_memory+1 }Gi
+                cpu: ${ vm_cpu+1 }
+            limits:
+                memory: ${ vm_memory+1 }Gi
+                cpu: ${ vm_cpu+1 }
+      terminationGracePeriodSeconds: 0
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: datavolumedisk1
+        dataVolume:
+          name: ${ vm_name }-dv
+%{ if additional_storage > 0 ~}
+      - name: datavolumedisk2
+        dataVolume:
+          name: ${ vm_name }-add-dv
+%{ endif ~}
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |-
+              #cloud-config
+              password: ${ password }
+              chpasswd: { expire: False }
+%{ if ssh_key != "" ~}
+              ssh_authorized_keys:
+              - ${ ssh_key }
+%{ endif ~}
+              packages:
+              - qemu-guest-agent
+              runcmd:
+              - [ systemctl, start, qemu-guest-agent ]
+  dataVolumeTemplates:
+  - metadata:
+      name: ${ vm_name }-dv
+    spec:
+      storage:
+        storageClassName: rook-ceph-block
+        volumeMode: Block
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50G
+      source:
+        http:
+          url: ${ vm_image }
+%{ if additional_storage > 0 ~}
+  - metadata:
+      name: ${ vm_name }-add-dv
+    spec:
+      storage:
+        storageClassName: rook-ceph-block
+        volumeMode: Block
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${ additional_storage }G
+      source:
+        blank: {}
+%{ endif ~}

@@ -88,7 +88,8 @@ resource "helm_release" "vcluster" {
   values = [templatefile("${path.module}/templates/vcluster-values.yaml.tftpl", {
     tolerations = length(var.tolerations) > 0 ? jsonencode(var.tolerations) : null
     values      = indent(12, var.importcluster)
-    })
+    }),
+    templatefile("${path.module}/templates/plugin.yaml", {})
   ]
 }
 

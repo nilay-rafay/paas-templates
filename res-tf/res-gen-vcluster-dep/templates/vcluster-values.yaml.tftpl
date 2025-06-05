@@ -16,6 +16,14 @@ experimental:
           release:
             name: v2-infra
             namespace: rafay-system
+      extraContainer:
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "rm -rf /plugins/* || true"
 sync:
   toHost:
     ingresses:

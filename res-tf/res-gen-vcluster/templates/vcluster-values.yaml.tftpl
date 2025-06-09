@@ -36,16 +36,3 @@ sync:
       enabled: true
 telemetry:
   enabled: false
-controlPlane:
-  distro:
-    k8s:
-      apiServer:
-        imagePullPolicy: "IfNotPresent"
-      controllerManager:
-        imagePullPolicy: "IfNotPresent"
-      scheduler:
-        imagePullPolicy: "IfNotPresent"
-    k3s:
-      imagePullPolicy: "IfNotPresent" 
-    k0s:
-      imagePullPolicy: "IfNotPresent"

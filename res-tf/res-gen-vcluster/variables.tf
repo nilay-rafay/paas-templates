@@ -187,3 +187,15 @@ variable "enable_kata_runtime" {
   type        = bool
   default     = false
 }
+
+variable "use_plugin" {
+  description = "Whether to include plugin configuration"
+  type        = bool
+  default     = false
+}
+
+variable "plugin_image" {
+  description = "Docker image to use for the vcluster plugin"
+  type        = string
+  default     = "registry.dev.rafay-edge.net/dev/rafay-vcluster-pro:20250519033318"
+}

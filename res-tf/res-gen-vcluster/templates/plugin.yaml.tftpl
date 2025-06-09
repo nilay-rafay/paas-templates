@@ -2,7 +2,7 @@
 # with the other vcluster values during vcluster create or helm install.
 plugins:
   rafay-vcluster-pro:
-    image: registry.dev.rafay-edge.net/dev/rafay-vcluster-pro:20250519033318
+    image: "${plugin_image}"
     imagePullPolicy: IfNotPresent
     rbac:
       role:

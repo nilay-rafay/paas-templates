@@ -71,10 +71,48 @@ resource "rafay_namespace" "namespace" {
   }
 }
 
-resource "helm_release" "vcluster" {
-  depends_on = [rafay_import_cluster.import_vcluster,rafay_namespace.namespace]
+# First definition (no plugin)
+resource "helm_release" "vcluster_no_plugin" {
+  count      = var.use_plugin ? 0 : 1
+  depends_on = [rafay_import_cluster.import_vcluster, rafay_namespace.namespace]
+
   name       = var.vcluster_name
-  # repository = "https://charts.loft.sh"
+  repository = "https://charts.loft.sh"
+  chart      = "vcluster"
+  version    = var.vcluster_version
+  namespace  = resource.rafay_namespace.namespace.metadata[0].name
+
+  create_namespace = true
+
+  set {
+    name  = "controlPlane.distro.${var.distro}.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "controlPlane.statefulSet.scheduling.podManagementPolicy"
+    value = "OrderedReady"
+  }
+
+  set {
+    name  = "controlPlane.statefulSet.persistence.volumeClaim.size"
+    value = var.vcluster_store_size
+  }
+
+  values = [
+    templatefile("${path.module}/templates/vcluster-values.yaml.tftpl", {
+      tolerations = length(var.tolerations) > 0 ? jsonencode(var.tolerations) : null
+      values      = indent(12, rafay_import_cluster.import_vcluster.values_data)
+    })
+  ]
+}
+
+# Second definition (with plugin)
+resource "helm_release" "vcluster_with_plugin" {
+  count      = var.use_plugin ? 1 : 0
+  depends_on = [rafay_import_cluster.import_vcluster, rafay_namespace.namespace]
+
+  name       = var.vcluster_name
   chart      = "${path.module}/chart/vcluster-0.25.0.tgz"
   version    = var.vcluster_version
   namespace  = resource.rafay_namespace.namespace.metadata[0].name
@@ -96,13 +134,17 @@ resource "helm_release" "vcluster" {
     value = var.vcluster_store_size
   }
 
-  values = [templatefile("${path.module}/templates/vcluster-values.yaml.tftpl", {
-    tolerations = length(var.tolerations) > 0 ? jsonencode(var.tolerations) : null
-    values      = indent(12, rafay_import_cluster.import_vcluster.values_data)
+  values = [
+    templatefile("${path.module}/templates/vcluster-values.yaml.tftpl", {
+      tolerations = length(var.tolerations) > 0 ? jsonencode(var.tolerations) : null
+      values      = indent(12, rafay_import_cluster.import_vcluster.values_data)
     }),
-    templatefile("${path.module}/templates/plugin.yaml", {})
+    templatefile("${path.module}/templates/plugin.yaml.tftpl", {
+      plugin_image = var.plugin_image
+    })
   ]
 }
+
 
 # Combine all namespaces
 locals {

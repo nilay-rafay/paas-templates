@@ -74,8 +74,8 @@ resource "rafay_namespace" "namespace" {
 resource "helm_release" "vcluster" {
   depends_on = [rafay_import_cluster.import_vcluster,rafay_namespace.namespace]
   name       = var.vcluster_name
-  repository = "https://charts.loft.sh"
-  chart      = "vcluster"
+  # repository = "https://charts.loft.sh"
+  chart      = "${path.module}/chart/vcluster-0.25.0.tgz"
   version    = var.vcluster_version
   namespace  = resource.rafay_namespace.namespace.metadata[0].name
 

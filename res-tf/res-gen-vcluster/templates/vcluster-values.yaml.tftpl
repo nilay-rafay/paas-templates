@@ -36,3 +36,10 @@ sync:
       enabled: true
 telemetry:
   enabled: false
+controlPlane:
+  statefulSet:
+    scheduling:
+      nodeSelector:
+        %{~ if length(device_details) > 0 ~}
+        kubernetes.io/hostname: ${device_details}
+        %{~ endif ~}

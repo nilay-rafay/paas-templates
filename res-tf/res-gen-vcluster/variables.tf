@@ -188,12 +188,6 @@ variable "enable_kata_runtime" {
   default     = false
 }
 
-variable "use_plugin" {
-  description = "Whether to include plugin configuration"
-  type        = bool
-  default     = false
-}
-
 variable "plugin_image" {
   description = "Docker image to use for the vcluster plugin"
   type        = string

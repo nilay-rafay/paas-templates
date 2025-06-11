@@ -193,3 +193,9 @@ variable "plugin_image" {
   type        = string
   default     = "registry.dev.rafay-edge.net/dev/rafay-vcluster-pro:20250519033318"
 }
+
+variable "device_details" {
+  description = "Device/node on which vcluster pods will be deployed"
+  type        = string
+  default     = ""
+}

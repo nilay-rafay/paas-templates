@@ -97,7 +97,7 @@ resource "helm_release" "vcluster" {
     templatefile("${path.module}/templates/vcluster-values.yaml.tftpl", {
       tolerations = length(var.tolerations) > 0 ? jsonencode(var.tolerations) : null
       values      = indent(12, rafay_import_cluster.import_vcluster.values_data)
-      device_details = "test"
+      device_details = var.device_details
     }),
     templatefile("${path.module}/templates/plugin.yaml.tftpl", {
       plugin_image = var.plugin_image

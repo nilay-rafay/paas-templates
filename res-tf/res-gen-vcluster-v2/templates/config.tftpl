@@ -1,0 +1,57 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ${ns_name}-nep
+  namespace: ${ns_name}
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ${ns_name}
+    %{~ if to_ns != null ~} 
+    %{~ for ns in jsondecode(to_ns) ~}
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ${ns.ns}
+        %{~ if can(ns.app) ~} 
+        k8s:k8s-app: ${ns.app}
+        %{~ endif ~}
+    %{~ endfor ~}
+    %{~ endif ~}
+  - toEntities:
+    - kube-apiserver
+  - toCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+  - toCIDR:
+    %{~ if tocidr_ips != null ~}%{~ for tol in jsondecode(tocidr_ips) ~}
+    - ${tol} 
+    %{~ endfor ~}%{~ endif ~}
+  endpointSelector:
+    matchLabels:
+      any:namespace: istio-system
+  ingress:
+  - fromCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+  - fromCIDR:
+   %{~ if fromcidr_ips != null ~} 
+    %{~ for tol in jsondecode(fromcidr_ips) ~}
+    - ${tol} 
+    %{~ endfor ~}
+    %{~ endif ~}
+  - fromEndpoints:
+    - matchLabels:
+        any:namespace: istio-system
+        k8s:io.kubernetes.pod.namespace: ${ns_name}
+    %{~ if from_ns != null ~} 
+    %{~ for ns in jsondecode(from_ns) ~}
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ${ns.ns}
+    %{~ endfor ~}
+    %{~ endif ~}

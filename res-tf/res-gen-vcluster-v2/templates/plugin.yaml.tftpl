@@ -1,0 +1,35 @@
+# Plugin Definition below. This is essentially a valid helm values file that will be merged
+# with the other vcluster values during vcluster create or helm install.
+plugins:
+  rafay-vcluster-pro:
+    image: "${plugin_image}"
+    imagePullPolicy: IfNotPresent
+    rbac:
+      role:
+        extraRules:
+          # Specify the KubeVirt resources and API groups you want to allow the plugin to access.
+          - apiGroups: ["kubevirt.io"]
+            resources: ["*"]  # Specify the KubeVirt CRDs you want to sync
+            verbs:
+              - "*"
+          - apiGroups: ["cdi.kubevirt.io"]
+            resources: ["*"]  # Specify additional KubeVirt-related resources (e.g., DataVolumes)
+            verbs:
+              - "*"
+      clusterRole:
+        extraRules:
+          # Allow access to CRDs themselves
+          - apiGroups: ["apiextensions.k8s.io"]
+            resources: ["customresourcedefinitions"]
+            verbs:
+              - "*"
+          # Allow access to resources from admission registration (in case KubeVirt CRDs have webhook validation or admission)
+          - apiGroups: ["admissionregistration.k8s.io"]
+            resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+            verbs:
+              - "*"
+
+# Ensure that the cluster role is enabled for watching the CRDs
+rbac:
+  clusterRole:
+    enabled: true

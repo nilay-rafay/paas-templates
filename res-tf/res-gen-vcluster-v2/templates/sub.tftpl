@@ -1,0 +1,13 @@
+apiVersion: kubeovn.io/v1
+kind: Subnet
+metadata:
+  name: ${ns_name}-subnet
+spec:
+  protocol: IPv4
+  cidrBlock: ${cidr}
+  gatewayType: distributed
+  natOutgoing: true
+  routeTable: ""
+  namespaces:
+  - ${ns_name}
+ 

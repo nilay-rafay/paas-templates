@@ -7,13 +7,6 @@ variable "host_cluster_name" {
   }
 }
 
-variable "vcluster_kubconfig_url" {
-  description = "vcluster kubeconfig file""
-  type        = string
-  default     = $(resource."res-gen-kubeconfig".output.cluster_kubeconfig.value)$
-}
-
-
 variable "vcluster_name" {
   description = "Name of the vcluster to deploy"
   type        = string

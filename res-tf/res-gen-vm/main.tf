@@ -1,3 +1,9 @@
+
+variable "input1" {
+  description = "First input"
+  type        = string
+}
+
 variable "vcluster_name" {
   description = "First input"
   type        = string
@@ -9,6 +15,10 @@ variable "rctl_config_path" {
   default     = "opt/rafay"
 }
 
+output "vcluster_kubeconfig_url" {
+    value = var.input1
+}
+
 variable "vm_name" {
   description = "vm name"
   type        = string
@@ -18,16 +28,16 @@ variable "vm_name" {
 #  value = var.input1
 #}
 
-data "rafay_download_kubeconfig" "kubeconfig_cluster" {
-  cluster = var.vcluster_name
+data "local_file" "downloaded_kubeconfig" {
+  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 
 resource "local_file" "kubeconfig" {
   lifecycle {
     ignore_changes = all
   }
-  depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
-  content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
+  depends_on = [null_resource.vcluster_kubeconfig]
+  content    = data.local_file.downloaded_kubeconfig.kubeconfig
   filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 
@@ -38,17 +48,17 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
   }
 }
 
-#resource "null_resource" "vcluster_kubeconfig" {
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
-#    EOT
-#  }
-#
-#  triggers = {
-#    url = var.vcluster_kubeconfig_url
-#  }
-#}
+resource "null_resource" "vcluster_kubeconfig" {
+  provisioner "local-exec" {
+    command = <<EOT
+      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
+    EOT
+  }
+
+  triggers = {
+    url = var.input1
+  }
+}
 
 #resource "null_resource" "vcluster_kubeconfig_ready" {
 #  depends_on = [null_resource.vcluster_kubeconfig]

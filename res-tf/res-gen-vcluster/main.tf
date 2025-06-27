@@ -19,7 +19,7 @@ resource "local_file" "vcluster_kubeconfig" {
 }
 
 output "kubeconfig_url" {
-  value = $(resource.res-gen-kubeconfig.output.cluster_kubeconfig.value)$
+  value = $(resource."res-gen-kubeconfig".output.cluster_kubeconfig.value)$
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {

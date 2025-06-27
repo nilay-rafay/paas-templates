@@ -134,8 +134,8 @@ resource "helm_release" "vcluster" {
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider   = kubernetes.vcluster
   depends_on = [
-    local_file.kubeconfig,
-    local_file.vcluster_kubeconfig,
+    null_resource.host_kubeconfig_ready,
+    null_resource.vcluster_kubeconfig_ready,
     rafay_import_cluster.import_vcluster,
   ]
   manifest = {

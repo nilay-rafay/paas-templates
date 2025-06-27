@@ -2,6 +2,32 @@ data "rafay_download_kubeconfig" "kubeconfig_cluster" {
   cluster = var.host_cluster_name
 }
 
+data "rafay_download_vcluster_kubeconfig" "vluster_kubeconfig_cluster" {
+  vcluster = var.vcluster_name
+}
+
+resource "local_file" "vcluster_kubeconfig" {
+  lifecycle {
+    ignore_changes = all
+  }
+  depends_on = [
+    data.rafay_download_kubeconfig.kubeconfig_cluster,
+    data.rafay_download_vcluster_kubeconfig.vcluster_kubeconfig_cluster,
+  ]
+  content    = data.rafay_download_vlcuster_kubeconfig.vcluster_kubeconfig_cluster.kubeconfig
+  filename   = "/tmp/test/${var.vcluster_name}-kubeconfig.yaml"
+}
+
+resource "null_resource" "vcluster_kubeconfig_ready" {
+  depends_on = [
+    local_file.kubeconfig,
+    local_file.vcluster_kubeconfig,,
+  ]
+  provisioner "local-exec" {
+    command = "while [ ! -f /tmp/test/${var.vcluster_name}-kubeconfig.yaml ]; do sleep 1; done"
+  }
+}
+
 resource "local_file" "kubeconfig" {
   lifecycle {
     ignore_changes = all
@@ -105,6 +131,75 @@ resource "helm_release" "vcluster" {
   ]
 }
 
+resource "kubernetes_manifest" "kubevirt_vm" {
+  depends_on = [
+    local_file.kubeconfig,
+    local_file.vcluster_kubeconfig,
+    rafay_import_cluster.import_vcluster,
+  ]
+  manifest = {
+    apiVersion = "kubevirt.io/v1"
+    kind       = "VirtualMachine"
+    metadata = {
+      name      = "test-vm"
+      namespace = "default"
+    }
+    spec = {
+      running = true
+      template = {
+        metadata = {
+          labels = {
+            kubevirt.io/domain = "test-vm"
+          }
+        }
+        spec = {
+          domain = {
+            devices = {
+              disks = [
+                {
+                  disk = {
+                    bus = "virtio"
+                  }
+                  name = "containerdisk"
+                },
+                {
+                  disk = {
+                    bus = "virtio"
+                  }
+                  name = "cloudinitdisk"
+                }
+              ]
+            }
+            resources = {
+              requests = {
+                memory = "512Mi"
+              }
+            }
+          }
+          volumes = [
+            {
+              name = "containerdisk"
+              containerDisk = {
+                image = "quay.io/containerdisks/fedora:37"
+              }
+            },
+            {
+              name = "cloudinitdisk"
+              cloudInitNoCloud = {
+                userData = <<-EOF
+                  #cloud-config
+                  password: fedora
+                  chpasswd: { expire: False }
+                  ssh_pwauth: True
+                EOF
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
 
 # Combine all namespaces
 locals {

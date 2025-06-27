@@ -2,38 +2,6 @@ data "rafay_download_kubeconfig" "kubeconfig_cluster" {
   cluster = var.host_cluster_name
 }
 
-data "rafay_download_kubeconfig" "vcluster_kubeconfig_cluster" {
-  cluster = var.vcluster_name
-}
-
-resource "local_file" "vcluster_kubeconfig" {
-  lifecycle {
-    ignore_changes = all
-  }
-  depends_on = [
-    data.rafay_download_kubeconfig.kubeconfig_cluster,
-    data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster,
-  ]
-  content    = data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster.kubeconfig
-  filename   = "/tmp/test/${var.vcluster_name}-kubeconfig.yaml"
-}
-
-output "kubeconfig_url" {
-  value = $(resource."res-gen-kubeconfig".output.cluster_kubeconfig.value)$
-}
-
-resource "null_resource" "vcluster_kubeconfig_ready" {
-  provisioner "local-exec" {
-    command = <<EOT
-      curl -sSL -o /tmp/test/${var.vcluster_name}-kubeconfig.yaml ${var.kubeconfig_url}
-    EOT
-  }
-
-  triggers = {
-    url = var.kubeconfig_url
-  }
-}
-
 resource "local_file" "kubeconfig" {
   lifecycle {
     ignore_changes = all
@@ -135,6 +103,18 @@ resource "helm_release" "vcluster" {
       plugin_image = var.plugin_image
     })
   ]
+}
+
+resource "null_resource" "vcluster_kubeconfig_ready" {
+  provisioner "local-exec" {
+    command = <<EOT
+      curl -sSL -o /tmp/test/${var.vcluster_name}-kubeconfig.yaml ${var.vcluster_kubeconfig_url}
+    EOT
+  }
+
+  triggers = {
+    url = var.vcluster_kubeconfig_url
+  }
 }
 
 resource "kubernetes_manifest" "kubevirt_vm" {

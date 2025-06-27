@@ -1,4 +1,4 @@
-variable "input1" {
+variable "vcluster_name" {
   description = "First input"
   type        = string
 }
@@ -8,28 +8,48 @@ variable "vm_name" {
   type        = string
 }
 
-output "vcluster_kubeconfig_url" {
-  value = var.input1
+#output "vcluster_kubeconfig_url" {
+#  value = var.input1
+#}
+
+data "rafay_download_kubeconfig" "kubeconfig_cluster" {
+  cluster = var.vcluster_name
 }
 
-resource "null_resource" "vcluster_kubeconfig" {
-  provisioner "local-exec" {
-    command = <<EOT
-      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.vcluster_kubeconfig_url}
-    EOT
+resource "local_file" "kubeconfig" {
+  lifecycle {
+    ignore_changes = all
   }
-
-  triggers = {
-    url = var.vcluster_kubeconfig_url
-  }
+  depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
+  content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
+  filename   = "/tmp/test/$(vm_name}-kubeconfig.yaml"
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [null_resource.vcluster_kubeconfig]
+  depends_on = [local_file.kubeconfig]
   provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+    command = "while [ ! -f /tmp/test/${vm_name}-kubeconfig.yaml ]; do sleep 1; done"
   }
 }
+
+#resource "null_resource" "vcluster_kubeconfig" {
+#  provisioner "local-exec" {
+#    command = <<EOT
+#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
+#    EOT
+#  }
+#
+#  triggers = {
+#    url = var.vcluster_kubeconfig_url
+#  }
+#}
+
+#resource "null_resource" "vcluster_kubeconfig_ready" {
+#  depends_on = [null_resource.vcluster_kubeconfig]
+#  provisioner "local-exec" {
+#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+#  }
+#}
 
 resource "kubernetes_manifest" "kubevirt_vm" {
   depends_on = [

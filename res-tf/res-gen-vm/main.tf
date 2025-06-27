@@ -52,6 +52,7 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
 #}
 
 resource "kubernetes_manifest" "kubevirt_vm" {
+  provider = kubernetes.vcluster
   depends_on = [
     null_resource.vcluster_kubeconfig_ready,
   ]

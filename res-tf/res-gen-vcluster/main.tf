@@ -3,7 +3,7 @@ data "rafay_download_kubeconfig" "kubeconfig_cluster" {
 }
 
 data "rafay_download_kubeconfig" "vcluster_kubeconfig_cluster" {
-  vcluster = var.vcluster_name
+  cluster = var.vcluster_name
 }
 
 resource "local_file" "vcluster_kubeconfig" {

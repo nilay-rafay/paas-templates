@@ -37,7 +37,7 @@ resource "local_file" "kubeconfig" {
     ignore_changes = all
   }
   depends_on = [null_resource.vcluster_kubeconfig]
-  content    = data.local_file.downloaded_kubeconfig.kubeconfig
+  content    = data.local_file.downloaded_kubeconfig.content
   filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 

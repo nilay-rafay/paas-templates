@@ -39,7 +39,7 @@ resource "kubernetes_manifest" "kubevirt_vm" {
     apiVersion = "kubevirt.io/v1"
     kind       = "VirtualMachine"
     metadata = {
-      name      = ${var.vm_name}
+      name      = var.vm_name
       namespace = "default"
     }
     spec = {
@@ -47,7 +47,7 @@ resource "kubernetes_manifest" "kubevirt_vm" {
       template = {
         metadata = {
           labels = {
-            "kubevirt.io/domain" = ${var.vm_name}
+            "kubevirt.io/domain" = var.vm_name
           }
         }
         spec = {

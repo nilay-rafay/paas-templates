@@ -28,7 +28,7 @@ resource "local_file" "kubeconfig" {
   }
   depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
   content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
-  filename   = "/tmp/test/$(var.vm_name}-kubeconfig.yaml"
+  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {

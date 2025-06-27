@@ -28,25 +28,25 @@ variable "vm_name" {
 #  value = var.input1
 #}
 
-data "local_file" "downloaded_kubeconfig" {
-  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
-}
+#data "local_file" "downloaded_kubeconfig" {
+#  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+#}
 
-resource "local_file" "kubeconfig" {
-  lifecycle {
-    ignore_changes = all
-  }
-  depends_on = [null_resource.vcluster_kubeconfig]
-  content    = data.local_file.downloaded_kubeconfig.content
-  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
-}
+#resource "local_file" "kubeconfig" {
+#  lifecycle {
+#    ignore_changes = all
+#  }
+#  depends_on = [null_resource.vcluster_kubeconfig]
+#  content    = data.local_file.downloaded_kubeconfig.content
+#  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+#}
 
-resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [local_file.kubeconfig]
-  provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
-  }
-}
+#resource "null_resource" "vcluster_kubeconfig_ready" {
+#  depends_on = [local_file.kubeconfig]
+#  provisioner "local-exec" {
+#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+#  }
+#}
 
 resource "null_resource" "vcluster_kubeconfig" {
   provisioner "local-exec" {

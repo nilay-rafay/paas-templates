@@ -21,7 +21,7 @@ resource "local_file" "vcluster_kubeconfig" {
 resource "null_resource" "vcluster_kubeconfig_ready" {
   depends_on = [
     local_file.kubeconfig,
-    local_file.vcluster_kubeconfig,,
+    local_file.vcluster_kubeconfig,
   ]
   provisioner "local-exec" {
     command = "while [ ! -f /tmp/test/${var.vcluster_name}-kubeconfig.yaml ]; do sleep 1; done"

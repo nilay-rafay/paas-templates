@@ -18,13 +18,19 @@ resource "local_file" "vcluster_kubeconfig" {
   filename   = "/tmp/test/${var.vcluster_name}-kubeconfig.yaml"
 }
 
+output "kubeconfig_url" {
+  value = $(resource.res-gen-kubeconfig.output.cluster_kubeconfig.value)$
+}
+
 resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [
-    local_file.kubeconfig,
-    local_file.vcluster_kubeconfig,
-  ]
   provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/${var.vcluster_name}-kubeconfig.yaml ]; do sleep 1; done"
+    command = <<EOT
+      curl -sSL -o /tmp/test/${var.vcluster_name}-kubeconfig.yaml ${var.kubeconfig_url}
+    EOT
+  }
+
+  triggers = {
+    url = var.kubeconfig_url
   }
 }
 

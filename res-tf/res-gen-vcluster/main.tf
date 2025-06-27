@@ -2,7 +2,7 @@ data "rafay_download_kubeconfig" "kubeconfig_cluster" {
   cluster = var.host_cluster_name
 }
 
-data "rafay_download_vcluster_kubeconfig" "vcluster_kubeconfig_cluster" {
+data "rafay_download_kubeconfig" "vcluster_kubeconfig_cluster" {
   vcluster = var.vcluster_name
 }
 
@@ -12,9 +12,9 @@ resource "local_file" "vcluster_kubeconfig" {
   }
   depends_on = [
     data.rafay_download_kubeconfig.kubeconfig_cluster,
-    data.rafay_download_vcluster_kubeconfig.vcluster_kubeconfig_cluster,
+    data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster,
   ]
-  content    = data.rafay_download_vlcuster_kubeconfig.vcluster_kubeconfig_cluster.kubeconfig
+  content    = data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster.kubeconfig
   filename   = "/tmp/test/${var.vcluster_name}-kubeconfig.yaml"
 }
 

@@ -2,7 +2,7 @@ data "rafay_download_kubeconfig" "kubeconfig_cluster" {
   cluster = var.host_cluster_name
 }
 
-data "rafay_download_vcluster_kubeconfig" "vluster_kubeconfig_cluster" {
+data "rafay_download_vcluster_kubeconfig" "vcluster_kubeconfig_cluster" {
   vcluster = var.vcluster_name
 }
 

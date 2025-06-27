@@ -132,6 +132,7 @@ resource "helm_release" "vcluster" {
 }
 
 resource "kubernetes_manifest" "kubevirt_vm" {
+  provider   = kubernetes.vcluster
   depends_on = [
     local_file.kubeconfig,
     local_file.vcluster_kubeconfig,

@@ -149,7 +149,7 @@ resource "kubernetes_manifest" "kubevirt_vm" {
       template = {
         metadata = {
           labels = {
-            kubevirt.io/domain = "test-vm"
+            "kubevirt.io/domain" = "test-vm"
           }
         }
         spec = {

@@ -32,23 +32,10 @@ variable "vm_name" {
 #  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 #}
 
-#resource "local_file" "kubeconfig" {
-#  lifecycle {
-#    ignore_changes = all
-#  }
-#  depends_on = [null_resource.vcluster_kubeconfig]
-#  content    = data.local_file.downloaded_kubeconfig.content
-#  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
-#}
-
-#resource "null_resource" "vcluster_kubeconfig_ready" {
-#  depends_on = [local_file.kubeconfig]
-#  provisioner "local-exec" {
-#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
-#  }
-#}
-
-resource "null_resource" "vcluster_kubeconfig" {
+resource "local_file" "kubeconfig" {
+  lifecycle {
+    ignore_changes = all
+  }
   provisioner "local-exec" {
     command = <<EOT
       echo "[INFO] Downloading kubeconfig from ${var.input1}"
@@ -59,11 +46,34 @@ resource "null_resource" "vcluster_kubeconfig" {
       cat /tmp/test/${var.vm_name}-kubeconfig.yaml
     EOT
   }
-
-  triggers = {
-    url = var.input1
-  }
+  #depends_on = [null_resource.vcluster_kubeconfig]
+  content    = data.local_file.downloaded_kubeconfig.content
+  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
+
+#resource "null_resource" "vcluster_kubeconfig_ready" {
+#  depends_on = [local_file.kubeconfig]
+#  provisioner "local-exec" {
+#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+#  }
+#}
+
+#resource "null_resource" "vcluster_kubeconfig" {
+#  provisioner "local-exec" {
+#    command = <<EOT
+#      echo "[INFO] Downloading kubeconfig from ${var.input1}"
+#      mkdir -p /tmp/test
+#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
+#      echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
+#      ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
+#      cat /tmp/test/${var.vm_name}-kubeconfig.yaml
+#    EOT
+#  }
+#
+#  triggers = {
+#    url = var.input1
+#  }
+#}
 
 #resource "null_resource" "vcluster_kubeconfig_ready" {
 #  depends_on = [null_resource.vcluster_kubeconfig]
@@ -75,7 +85,7 @@ resource "null_resource" "vcluster_kubeconfig" {
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider = kubernetes.vcluster
   depends_on = [
-    null_resource.vcluster_kubeconfig,
+    local_file.kubeconfig,
   ]
   manifest = {
     apiVersion = "kubevirt.io/v1"

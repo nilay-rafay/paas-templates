@@ -1,6 +1,6 @@
 provider "kubernetes" {
   alias       = "vcluster"
-  config_path = config_path = local_file.kubeconfig.filename
+  config_path = local_file.kubeconfig.filename
 }
 
 terraform {

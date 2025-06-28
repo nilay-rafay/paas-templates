@@ -102,7 +102,7 @@ resource "null_resource" "host_kubeconfig_ready" {
 
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider = kubernetes.vcluster
-  depends_on = [ null_resource.host_kubeconfig_ready
+  depends_on = [null_resource.host_kubeconfig_ready]
   manifest = {
     apiVersion = "kubevirt.io/v1"
     kind       = "VirtualMachine"

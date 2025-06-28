@@ -47,7 +47,7 @@ resource "local_file" "kubeconfig" {
     EOT
   }
   #depends_on = [null_resource.vcluster_kubeconfig]
-  content    = data.local_file.downloaded_kubeconfig.content
+  content    = ownloaded_kubeconfig.content
   filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 

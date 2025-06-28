@@ -32,10 +32,7 @@ variable "vm_name" {
 #  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 #}
 
-resource "local_file" "kubeconfig" {
-  lifecycle {
-    ignore_changes = all
-  }
+resource "null_resource" "download_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       echo "[INFO] Downloading kubeconfig from ${var.input1}"
@@ -43,12 +40,13 @@ resource "local_file" "kubeconfig" {
       curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
       echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
       ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
-      cat /tmp/test/${var.vm_name}-kubeconfig.yaml
     EOT
   }
-  #depends_on = [null_resource.vcluster_kubeconfig]
-  #content    = downloaded_kubeconfig.content
-  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+
+  triggers = {
+    always_run = timestamp()
+  }
+
 }
 
 #resource "null_resource" "vcluster_kubeconfig_ready" {
@@ -84,9 +82,7 @@ resource "local_file" "kubeconfig" {
 
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider = kubernetes.vcluster
-  depends_on = [
-    local_file.kubeconfig,
-  ]
+  depends_on = [null_resource.download_kubeconfig]
   manifest = {
     apiVersion = "kubevirt.io/v1"
     kind       = "VirtualMachine"

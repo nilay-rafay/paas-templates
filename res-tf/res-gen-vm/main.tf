@@ -32,22 +32,42 @@ variable "vm_name" {
 #  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 #}
 
-resource "null_resource" "download_kubeconfig" {
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "[INFO] Downloading kubeconfig from ${var.input1}"
-      mkdir -p /tmp/test
-      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
-      echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
-      ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
-    EOT
-  }
-
-  triggers = {
-    always_run = timestamp()
-  }
-
+data "rafay_download_kubeconfig" "kubeconfig_cluster" {
+  cluster = var.vcluster_name
 }
+
+resource "local_file" "kubeconfig" {
+  lifecycle {
+    ignore_changes = all
+  }
+  depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
+  content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
+  filename   = "/tmp/test/${vm_name}-kubeconfig.yaml"
+}
+
+resource "null_resource" "host_kubeconfig_ready" {
+  depends_on = [local_file.kubeconfig]
+  provisioner "local-exec" {
+    command = "while [ ! -f /tmp/test/${vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+  }
+}
+
+#resource "null_resource" "download_kubeconfig" {
+#  provisioner "local-exec" {
+#    command = <<EOT
+#      echo "[INFO] Downloading kubeconfig from ${var.input1}"
+#      mkdir -p /tmp/test
+#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
+#      echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
+#      ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
+#    EOT
+#  }
+#
+#  triggers = {
+#    always_run = timestamp()
+#  }
+#
+#}
 
 #resource "null_resource" "vcluster_kubeconfig_ready" {
 #  depends_on = [local_file.kubeconfig]
@@ -82,7 +102,7 @@ resource "null_resource" "download_kubeconfig" {
 
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider = kubernetes.vcluster
-  depends_on = [null_resource.download_kubeconfig]
+  depends_on = [ null_resource.host_kubeconfig_ready
   manifest = {
     apiVersion = "kubevirt.io/v1"
     kind       = "VirtualMachine"

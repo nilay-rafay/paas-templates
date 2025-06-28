@@ -1,6 +1,6 @@
 provider "kubernetes" {
   alias       = "vcluster"
-  config_path = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+  config_path = config_path = local_file.kubeconfig.filename
 }
 
 terraform {

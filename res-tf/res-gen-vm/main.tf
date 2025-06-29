@@ -24,81 +24,25 @@ variable "vm_name" {
   type        = string
 }
 
-#output "vcluster_kubeconfig_url" {
-#  value = var.input1
-#}
-
-#data "local_file" "downloaded_kubeconfig" {
-#  filename = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
-#}
-
-data "rafay_download_kubeconfig" "vcluster_kubeconfig_cluster" {
+data "rafay_download_kubeconfig" "kubeconfig_cluster" {
   cluster = var.vcluster_name
 }
 
-resource "local_file" "vcluster_kubeconfig" {
+resource "local_file" "kubeconfig" {
   lifecycle {
     ignore_changes = all
   }
-  depends_on = [data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster]
-  content    = data.rafay_download_kubeconfig.vcluster_kubeconfig_cluster.kubeconfig
+  depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
+  content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
   filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [local_file.vcluster_kubeconfig]
+  depends_on = [local_file.kubeconfig]
   provisioner "local-exec" {
     command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
   }
 }
-
-#resource "null_resource" "download_kubeconfig" {
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      echo "[INFO] Downloading kubeconfig from ${var.input1}"
-#      mkdir -p /tmp/test
-#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
-#      echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
-#      ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
-#    EOT
-#  }
-#
-#  triggers = {
-#    always_run = timestamp()
-#  }
-#
-#}
-
-#resource "null_resource" "vcluster_kubeconfig_ready" {
-#  depends_on = [local_file.kubeconfig]
-#  provisioner "local-exec" {
-#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
-#  }
-#}
-
-#resource "null_resource" "vcluster_kubeconfig" {
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      echo "[INFO] Downloading kubeconfig from ${var.input1}"
-#      mkdir -p /tmp/test
-#      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
-#      echo "[INFO] File downloaded to /tmp/test/${var.vm_name}-kubeconfig.yaml"
-#      ls -l /tmp/test/${var.vm_name}-kubeconfig.yaml
-#      cat /tmp/test/${var.vm_name}-kubeconfig.yaml
-#    EOT
-#  }
-#
-#  triggers = {
-#    url = var.input1
-#  }
-#}
-
-#resource "null_resource" "vcluster_kubeconfig_ready" {
-#  depends_on = [null_resource.vcluster_kubeconfig]
-#  provisioner "local-exec" {
-#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
-#  }
-#}
 
 resource "kubernetes_manifest" "kubevirt_vm" {
   provider = kubernetes.vcluster

@@ -1,22 +1,6 @@
-
 variable "input1" {
   description = "First input"
   type        = string
-}
-
-variable "vcluster_name" {
-  description = "First input"
-  type        = string
-}
-
-variable "rctl_config_path" {
-  description = "The path to the Rafay CLI config file"
-  type        = string
-  default     = "opt/rafay"
-}
-
-output "vcluster_kubeconfig_url" {
-    value = var.input1
 }
 
 variable "vm_name" {
@@ -24,21 +8,24 @@ variable "vm_name" {
   type        = string
 }
 
-data "rafay_download_kubeconfig" "kubeconfig_cluster" {
-  cluster = var.vcluster_name
+output "vcluster_kubeconfig_url" {
+  value = var.input1
 }
 
-resource "local_file" "kubeconfig" {
-  lifecycle {
-    ignore_changes = all
+resource "null_resource" "vcluster_kubeconfig" {
+  provisioner "local-exec" {
+    command = <<EOT
+      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.vcluster_kubeconfig_url}
+    EOT
   }
-  depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
-  content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
-  filename   = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+
+  triggers = {
+    url = var.vcluster_kubeconfig_url
+  }
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [local_file.kubeconfig]
+  depends_on = [null_resource.vcluster_kubeconfig]
   provisioner "local-exec" {
     command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
   }

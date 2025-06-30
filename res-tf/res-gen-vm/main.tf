@@ -92,4 +92,4 @@ resource "kubectl_manifest" "kubevirt_vm" {
     password  = var.password
     ssh_key   = var.ssh_key
   })
-#}
+}

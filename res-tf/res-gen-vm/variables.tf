@@ -52,7 +52,7 @@ variable "password" {
 
 
 variable "ssh_key" {
-  description = "public ssh key""
+  description = "public ssh key"
   type        = string
   default     = "abcd"
 }

@@ -82,6 +82,7 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
 #}
 
 resource "kubectl_manifest" "kubevirt_vm" {
+  depends_on = [null_resource.vcluster_kubeconfig_ready]
   yaml_body = templatefile("${path.module}/templates/vm.yaml.tmpl", {
     vm_name   = var.vm_name
     namespace = var.namespace

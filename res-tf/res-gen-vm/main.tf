@@ -64,68 +64,40 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
 
 resource "kubectl_manifest" "kubevirt_vm" {
   depends_on = [null_resource.vcluster_kubeconfig_ready]
-  yaml_body = <<YAML
-  manifest = {
-    apiVersion = "kubevirt.io/v1"
-    kind       = "VirtualMachine"
-    metadata = {
-      name      = var.vm_name
-      namespace = "default"
-    }
-    spec = {
-      running = true
-      template = {
-        metadata = {
-          labels = {
-            "kubevirt.io/domain" = var.vm_name
-          }
-        }
-        spec = {
-          domain = {
-            devices = {
-              disks = [
-                {
-                  disk = {
-                    bus = "virtio"
-                  }
-                  name = "containerdisk"
-                },
-                {
-                  disk = {
-                    bus = "virtio"
-                  }
-                  name = "cloudinitdisk"
-                }
-              ]
-            }
-            resources = {
-              requests = {
-                memory = "512Mi"
-              }
-            }
-          }
-          volumes = [
-            {
-              name = "containerdisk"
-              containerDisk = {
-                image = "quay.io/containerdisks/fedora:37"
-              }
-            },
-            {
-              name = "cloudinitdisk"
-              cloudInitNoCloud = {
-                userData = <<-EOF
-                  #cloud-config
-                  password: fedora
-                  chpasswd: { expire: False }
-                  ssh_pwauth: True
-                EOF
-              }
-            }
-          ]
-        }
-      }
-    }
-  }
-  YAML
+  yaml_body = <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: test-vm
+  namespace: default
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: test-vm
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+        resources:
+          requests:
+            memory: 1024M
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: kubevirt/fedora-cloud-container-disk-demo:latest
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+EOF
 }

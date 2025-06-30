@@ -1,6 +1,5 @@
-provider "kubernetes" {
-  alias       = "vcluster"
-  config_path = "/tmp/test/${var.vm_name}-kubeconfig.yaml"
+provider "kubectl" {
+  config_path = local_file.kubeconfig.filename
 }
 
 terraform {
@@ -29,6 +28,11 @@ terraform {
       source = "hashicorp/local"
       version = "2.5.2"
     }
+    kubectl = {
+      source = "bnu0/kubectl"
+      version = "0.27.0"
+    }
+  }
   }
 }
 

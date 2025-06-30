@@ -68,14 +68,14 @@ resource "kubectl_manifest" "kubevirt_vm" {
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: test-vm
+  name: test-vm2
   namespace: default
 spec:
   running: true
   template:
     metadata:
       labels:
-        kubevirt.io/domain: test-vm
+        kubevirt.io/domain: test-vm2
     spec:
       domain:
         devices:

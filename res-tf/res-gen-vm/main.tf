@@ -41,55 +41,55 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
   }
 }
 
-#resource "kubectl_manifest" "kubevirt_vm" {
-#  depends_on = [null_resource.vcluster_kubeconfig_ready]
-#  yaml_body = <<EOF
-#apiVersion: kubevirt.io/v1
-#kind: VirtualMachine
-#metadata:
-#  name: test-vm2
-#  namespace: default
-#spec:
-#  running: true
-#  template:
-#    metadata:
-#      labels:
-#        kubevirt.io/domain: test-vm2
-#    spec:
-#      domain:
-#        devices:
-#          disks:
-#            - name: containerdisk
-#              disk:
-#                bus: virtio
-#            - name: cloudinitdisk
-#              disk:
-#                bus: virtio
-#        resources:
-#          requests:
-#            memory: 1024M
-#      volumes:
-#        - name: containerdisk
-#          containerDisk:
-#            image: kubevirt/fedora-cloud-container-disk-demo:latest
-#        - name: cloudinitdisk
-#          cloudInitNoCloud:
-#            userData: |
-#              #cloud-config
-#              password: fedora
-#              chpasswd: { expire: False }
-#EOF
-#}
-
 resource "kubectl_manifest" "kubevirt_vm" {
   depends_on = [null_resource.vcluster_kubeconfig_ready]
-  yaml_body = templatefile("${path.module}/templates/vm.yaml.tmpl", {
-    vm_name   = var.vm_name
-    namespace = var.namespace
-    memory    = var.memory
-    image     = var.image
-    user      = var.user
-    password  = var.password
-    ssh_key   = var.ssh_key
-  })
+  yaml_body = <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: test-vm2
+  namespace: default
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: test-vm2
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+        resources:
+          requests:
+            memory: 1024M
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/containerdisks/fedora:latest
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+EOF
 }
+
+#resource "kubectl_manifest" "kubevirt_vm" {
+#  depends_on = [null_resource.vcluster_kubeconfig_ready]
+#  yaml_body = templatefile("${path.module}/templates/vm.yaml.tmpl", {
+#    vm_name   = var.vm_name
+#    namespace = var.namespace
+#    memory    = var.memory
+#    image     = var.image
+#    user      = var.user
+#    password  = var.password
+#    ssh_key   = var.ssh_key
+#  })
+#}

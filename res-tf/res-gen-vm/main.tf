@@ -3,6 +3,12 @@ variable "input1" {
   type        = string
 }
 
+variable "rctl_config_path" {
+  description = "The path to the Rafay CLI config file"
+  type        = string
+  default     = "opt/rafay"
+}
+
 variable "vm_name" {
   description = "vm name"
   type        = string

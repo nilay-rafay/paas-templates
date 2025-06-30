@@ -22,7 +22,7 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: ${vm_image}
+            image: ${image}
         - name: cloudinitdisk
           cloudInitNoCloud:
             userData: |

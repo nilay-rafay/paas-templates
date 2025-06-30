@@ -31,13 +31,13 @@ resource "local_file" "kubeconfig" {
   }
   depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
   content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
-  filename   = "/tmp/test/vcluster1-kubeconfig.yaml"
+  filename   = "/tmp/test/vcluster2-kubeconfig.yaml"
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {
   depends_on = [local_file.kubeconfig]
   provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/vcluster1-kubeconfig.yaml ]; do sleep 1; done"
+    command = "while [ ! -f /tmp/test/vcluster2-kubeconfig.yaml ]; do sleep 1; done"
   }
 }
 

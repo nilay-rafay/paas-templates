@@ -1,16 +1,16 @@
-#variable "input1" {
-#  description = "First input"
-#  type        = string
-#}
+variable "input1" {
+  description = "First input"
+  type        = string
+}
 
 variable "vm_name" {
   description = "vm name"
   type        = string
 }
 
-#output "vcluster_kubeconfig_url" {
-#  value = var.input1
-#}
+output "vcluster_kubeconfig_url" {
+  value = var.input1
+}
 
 #resource "null_resource" "vcluster_kubeconfig" {
 #  provisioner "local-exec" {

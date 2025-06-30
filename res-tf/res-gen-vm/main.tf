@@ -9,6 +9,11 @@ variable "rctl_config_path" {
   default     = "opt/rafay"
 }
 
+variable "vcluster_name" {
+  description = "vcluster name"
+  type        = string
+}
+
 variable "vm_name" {
   description = "vm name"
   type        = string

@@ -15,12 +15,12 @@ output "vcluster_kubeconfig_url" {
 resource "null_resource" "vcluster_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
-      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.vcluster_kubeconfig_url}
+      curl -sSL -o /tmp/test/${var.vm_name}-kubeconfig.yaml ${var.input1}
     EOT
   }
 
   triggers = {
-    url = var.vcluster_kubeconfig_url
+    url = var.input1
   }
 }
 

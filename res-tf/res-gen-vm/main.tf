@@ -1,6 +1,6 @@
-output "vcluster_kubeconfig_url" {
-  value = var.input1
-}
+#output "vcluster_kubeconfig_url" {
+#  value = var.input1
+#}
 
 #resource "null_resource" "vcluster_kubeconfig" {
 #  provisioner "local-exec" {
@@ -31,13 +31,13 @@ resource "local_file" "kubeconfig" {
   }
   depends_on = [data.rafay_download_kubeconfig.kubeconfig_cluster]
   content    = data.rafay_download_kubeconfig.kubeconfig_cluster.kubeconfig
-  filename   = "/tmp/test/vcluster2-kubeconfig.yaml"
+  filename   = "/tmp/test/vcluster-kubeconfig.yaml"
 }
 
 resource "null_resource" "vcluster_kubeconfig_ready" {
   depends_on = [local_file.kubeconfig]
   provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/vcluster2-kubeconfig.yaml ]; do sleep 1; done"
+    command = "while [ ! -f /tmp/test/vcluster-kubeconfig.yaml ]; do sleep 1; done"
   }
 }
 
@@ -81,15 +81,34 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
 #EOF
 #}
 
-resource "kubectl_manifest" "kubevirt_vm" {
-  depends_on = [null_resource.vcluster_kubeconfig_ready]
-  yaml_body = templatefile("${path.module}/templates/vm.yaml.tmpl", {
-    vm_name   = var.vm_name
-    namespace = var.namespace
-    memory    = var.memory
-    image     = var.image
-    user      = var.user
-    password  = var.password
+#resource "kubectl_manifest" "kubevirt_vm" {
+#  depends_on = [null_resource.vcluster_kubeconfig_ready]
+#  yaml_body = templatefile("${path.module}/templates/vm.yaml.tmpl", {
+#    vm_name   = var.vm_name
+#    namespace = var.namespace
+#    memory    = var.memory
+#    image     = var.image
+#    user      = var.user
+#    password  = var.password
+#    ssh_key   = var.ssh_key
+#  })
+#}
+
+data "template_file" "vm_yaml" {
+  template = file("${path.module}/templates/vm.yaml.tftpl")
+
+  vars = {
+    vm_name            = var.vm_name
+    namespace          = var.namespace
+    memory             = var.memory
+    image = var.image
+    user           = var.user
+    password           = var.password
     ssh_key   = var.ssh_key
-  })
+  }
+}
+
+resource "kubernetes_manifest" "kubevirt_vm" {
+  depends_on = [null_resource.vcluster_kubeconfig_ready]
+  manifest = yamldecode(data.template_file.vm_yaml.rendered)
 }

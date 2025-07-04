@@ -1,4 +1,8 @@
-provider "kubectl" {
+#provider "kubectl" {
+#  config_path = local_file.kubeconfig.filename
+#}
+
+provider "kubernetes" {
   config_path = local_file.kubeconfig.filename
 }
 

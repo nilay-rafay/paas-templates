@@ -1,7 +1,7 @@
-variable "input1" {
-  description = "First input"
-  type        = string
-}
+#variable "input1" {
+#  description = "First input"
+#  type        = string
+#}
 
 variable "rctl_config_path" {
   description = "The path to the Rafay CLI config file"
@@ -56,7 +56,3 @@ variable "ssh_key" {
   type        = string
   default     = "abcd"
 }
-
-
-
-

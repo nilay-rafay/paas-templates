@@ -17,7 +17,7 @@
 #resource "null_resource" "vcluster_kubeconfig_ready" {
 #  depends_on = [null_resource.vcluster_kubeconfig]
 #  provisioner "local-exec" {
-#    command = "while [ ! -f /tmp/test/${var.vm_name}-kubeconfig.yaml ]; do sleep 1; done"
+#    command = "while [ ! -f /tmp/test/vcluster-kubeconfig.yaml ]; do sleep 1; done"
 #  }
 #}
 
@@ -34,12 +34,12 @@ resource "local_file" "kubeconfig" {
   filename   = "/tmp/test/vcluster-kubeconfig.yaml"
 }
 
-resource "null_resource" "vcluster_kubeconfig_ready" {
-  depends_on = [local_file.kubeconfig]
-  provisioner "local-exec" {
-    command = "while [ ! -f /tmp/test/vcluster-kubeconfig.yaml ]; do sleep 1; done"
-  }
-}
+#resource "null_resource" "vcluster_kubeconfig_ready" {
+#  depends_on = [local_file.kubeconfig]
+#  provisioner "local-exec" {
+#    command = "while [ ! -f /tmp/test/vcluster-kubeconfig.yaml ]; do sleep 1; done"
+#  }
+#}
 
 #resource "kubectl_manifest" "kubevirt_vm" {
 #  depends_on = [null_resource.vcluster_kubeconfig_ready]
@@ -109,6 +109,7 @@ data "template_file" "vm_yaml" {
 }
 
 resource "kubernetes_manifest" "kubevirt_vm" {
+  provider = kubernetes
   depends_on = [null_resource.vcluster_kubeconfig_ready]
   manifest = yamldecode(data.template_file.vm_yaml.rendered)
 }

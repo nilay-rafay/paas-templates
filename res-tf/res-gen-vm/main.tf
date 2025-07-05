@@ -95,7 +95,7 @@ resource "null_resource" "vcluster_kubeconfig_ready" {
 #}
 
 data "template_file" "vm_yaml" {
-  template = file("${path.module}/templates/vm.yaml.tftpl")
+  template = file("${path.module}/templates/vm.yaml.tmpl")
 
   vars = {
     vm_name            = var.vm_name
